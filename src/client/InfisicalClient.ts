@@ -15,7 +15,7 @@ export class Infisical {
     private apiRequest: AxiosInstance;
     private secrets: { [key: string]: string } | null = null
 
-    private static globalInstance: Infisical;
+    public static globalInstance: Infisical;
 
     constructor({
         token,
