@@ -4,7 +4,7 @@ export declare class Infisical {
     private key;
     private apiRequest;
     private secrets;
-    private static globalInstance;
+    static globalInstance: Infisical;
     constructor({ token, siteURL, }: {
         token: string;
         siteURL?: string;
