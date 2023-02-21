@@ -1,14 +1,6 @@
-import { AxiosInstance } from 'axios';
+import { GetSecretsProps } from "../types/api";
 
-const getSecrets = async ({
-    apiRequest,
-    workspaceId,
-    environment
-}: {
-    apiRequest: AxiosInstance;
-    workspaceId: string;
-    environment: string;
-}) => {
+const getSecrets = async ({ apiRequest, workspaceId, environment }: GetSecretsProps) => {
     const { data } = await apiRequest.get('/api/v2/secrets', {
         params: {
             workspaceId,

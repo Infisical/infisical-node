@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import * as nacl from 'tweetnacl';
 import * as util from 'tweetnacl-util';
+import { DecryptAsymmetric, DecryptSymmetric, EncryptAsymmetric, EncryptSymmetric } from '../types/utils';
 
 /**
  * Return assymmetrically encrypted [plaintext] using [publicKey] where
@@ -13,15 +14,7 @@ import * as util from 'tweetnacl-util';
  * @returns {String} ciphertext - base64-encoded ciphertext
  * @returns {String} nonce - base64-encoded nonce
  */
-const encryptAsymmetric = ({
-	plaintext,
-	publicKey,
-	privateKey
-}: {
-	plaintext: string;
-	publicKey: string;
-	privateKey: string;
-}) => {
+const encryptAsymmetric = ({ plaintext, publicKey, privateKey }: EncryptAsymmetric) => {
 	const nonce = nacl.randomBytes(24);
     const ciphertext = nacl.box(
         util.decodeUTF8(plaintext),
@@ -46,17 +39,7 @@ const encryptAsymmetric = ({
  * @param {String} obj.privateKey - private key of the receiver (current user)
  * @param {String} plaintext - UTF8 plaintext
  */
-const decryptAsymmetric = ({
-	ciphertext,
-	nonce,
-	publicKey,
-	privateKey
-}: {
-	ciphertext: string;
-	nonce: string;
-	publicKey: string;
-	privateKey: string;
-}) => nacl.box.open(
+const decryptAsymmetric = ({ ciphertext, nonce, publicKey, privateKey }: DecryptAsymmetric) => nacl.box.open(
         util.decodeBase64(ciphertext),
         util.decodeBase64(nonce),
         util.decodeBase64(publicKey),
@@ -69,13 +52,7 @@ const decryptAsymmetric = ({
  * @param {String} obj.plaintext - plaintext to encrypt
  * @param {String} obj.key - hex key
  */
-const encryptSymmetric = ({
-	plaintext,
-	key
-}: {
-	plaintext: string;
-	key: string;
-}) => {
+const encryptSymmetric = ({ plaintext, key }: EncryptSymmetric) => {
     const ALGORITHM = 'aes-256-gcm';
     const BLOCK_SIZE_BYTES = 16;
 
@@ -101,17 +78,7 @@ const encryptSymmetric = ({
  * @param {String} obj.key - hex key
  *
  */
-const decryptSymmetric = ({
-	ciphertext,
-	iv,
-	tag,
-	key
-}: {
-	ciphertext: string;
-	iv: string;
-	tag: string;
-	key: string;
-}) => {
+const decryptSymmetric = ({ ciphertext, iv, tag, key }: DecryptSymmetric) => {
     const ALGORITHM = 'aes-256-gcm';
     
     const decipher = crypto.createDecipheriv(

@@ -1,19 +1,13 @@
-import { Secret } from "../types/models";
+import { DecryptSecrets, Secret, SecretsObj } from "../types/KeyService";
 import { decryptSymmetric } from '../utils/crypto';
 
 /**
  * Class for key-related actions
  */
 export default class KeyService {
-    static decryptSecrets({
-        encryptedSecrets,
-        workspaceKey
-    }: {
-        encryptedSecrets: Secret[],
-        workspaceKey: string;
-    }) {
+    static decryptSecrets({ encryptedSecrets, workspaceKey }: DecryptSecrets) {
         // console.log('encryptedSecrets', encryptedSecrets);
-        let secretsObj: { [key: string] : string } = {};
+        let secretsObj: SecretsObj = {};
         
         // decrypt secret keys, values, and comments
         encryptedSecrets.forEach((encryptedSecret: Secret) => {

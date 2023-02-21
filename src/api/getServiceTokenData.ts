@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance } from '../types/api';
 
 const getServiceTokenData = async ({
     apiRequest 

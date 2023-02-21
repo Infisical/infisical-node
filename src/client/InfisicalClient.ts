@@ -7,23 +7,19 @@ import {
     getServiceTokenData,
     getSecrets
 } from '../api';
+import { SecretsObj } from '../types/KeyService';
+import { ClientParamType } from '../types/InfisicalClient';
 
 export class Infisical {
     private workspaceId: string;
     private environment: string;
     private key: string;
     private apiRequest: AxiosInstance;
-    private secrets: { [key: string]: string } | null = null
+    private secrets: SecretsObj | null = null
 
     public static globalInstance: Infisical;
 
-    constructor({
-        token,
-        siteURL = INFISICAL_URL,
-    }: {
-        token: string;
-        siteURL?: string;
-    }) {
+    constructor({ token, siteURL = INFISICAL_URL }: ClientParamType) {
         const lastDotIdx = token.lastIndexOf('.');
         const serviceToken = token.substring(0, lastDotIdx);
         const key = token.substring(lastDotIdx + 1);
@@ -45,13 +41,7 @@ export class Infisical {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    public static async connect({
-        token,
-        siteURL = INFISICAL_URL,
-    }: {
-        token: string;
-        siteURL?: string;
-    }) {
+    public static async connect({ token, siteURL = INFISICAL_URL }: ClientParamType) {
         const instance = new Infisical({
             token,
             siteURL
@@ -68,13 +58,7 @@ export class Infisical {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    public static async createConnection({
-        token,
-        siteURL = INFISICAL_URL
-    }: {
-        token: string;
-        siteURL?: string; 
-    }) {
+    public static async createConnection({ token, siteURL = INFISICAL_URL }: ClientParamType) {
         const instance = new Infisical({
             token,
             siteURL
