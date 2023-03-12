@@ -1,12 +1,7 @@
 import axios from 'axios';
+import { ApiRequestInterceptorProps } from '../types/api';
 
-const createApiRequestWithAuthInterceptor = ({
-    baseURL,
-    serviceToken
-}: {
-    baseURL: string;
-    serviceToken: string;
-}) => {
+const createApiRequestWithAuthInterceptor = ({ baseURL, serviceToken }: ApiRequestInterceptorProps) => {
     const apiRequest = axios.create({
         baseURL,
         headers: {
