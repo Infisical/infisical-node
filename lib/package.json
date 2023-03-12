@@ -1,10 +1,10 @@
 {
     "name": "infisical-node",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "",
     "main": "lib/index.js",
     "scripts": {
-        "build": "tsc"
+        "build": "rm -rf lib && tsc"
     },
     "author": "",
     "license": "ISC",

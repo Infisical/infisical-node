@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf lib && tsc"
   },
   "author": "",
   "license": "ISC",
