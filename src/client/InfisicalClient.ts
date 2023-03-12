@@ -48,15 +48,19 @@ export class Infisical {
     public static async connect({
         token,
         siteURL = INFISICAL_URL,
+        attachToProcessEnv = false
     }: {
         token: string;
         siteURL?: string;
+        attachToProcessEnv?: boolean;
     }) {
         const instance = new Infisical({
             token,
             siteURL
         });
-        await instance.setup();
+        await instance.setup({
+            attachToProcessEnv
+        });
         this.globalInstance = instance;
         return instance;
     }
@@ -79,7 +83,7 @@ export class Infisical {
             token,
             siteURL
         });
-        await instance.setup();
+        await instance.setup({});
         return instance;
     };
     
@@ -87,7 +91,11 @@ export class Infisical {
      * Sets up the Infisical client by getting data and secrets 
      * associated with the instance's Infisical token
      */
-    public async setup() {
+    public async setup({
+        attachToProcessEnv= false
+    }: {
+        attachToProcessEnv?: boolean;
+    }) {
         try {
             // get service token data
             const serviceTokenData = await getServiceTokenData({
@@ -113,10 +121,20 @@ export class Infisical {
             });
             
             // decrypt secrets
-            this.secrets = KeyService.decryptSecrets({
+            const secrets = KeyService.decryptSecrets({
                 encryptedSecrets: encryptedSecrets.secrets,
                 workspaceKey
             });
+            
+            this.secrets = secrets;
+            
+            if (attachToProcessEnv) {
+                // case: add secrets to [process.env]
+                Object.keys(secrets).map((key: string) => {
+                    process.env[key] = secrets[key]
+                });
+            }
+            
         } catch (err) {
             console.log('Failed to set up the Infisical client. Please check that your token is valid.');
             console.error(err);
