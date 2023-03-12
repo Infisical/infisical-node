@@ -4,9 +4,11 @@ export declare class InfisicalClient {
     private key;
     private apiRequest;
     private secrets;
-    constructor({ token, siteURL }: {
+    private debug;
+    constructor({ token, siteURL, debug }: {
         token: string;
         siteURL: string;
+        debug: boolean;
     });
     /**
      * Connect to Infisical and return a new instance of Infisical
@@ -15,13 +17,14 @@ export declare class InfisicalClient {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    static connect({ token, siteURL, attachToProcessEnv, defaultValues }: {
+    static connect({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
         defaultValues?: {
             [key: string]: string;
         };
+        debug?: boolean;
     }): Promise<InfisicalClient>;
     /**
      * Sets up the Infisical client by getting data and secrets
