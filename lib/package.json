@@ -1,8 +1,8 @@
 {
     "name": "infisical-node",
-    "version": "1.0.11",
+    "version": "1.0.13",
     "description": "",
-    "main": "src/index.js",
+    "main": "lib/src/index.js",
     "scripts": {
         "build": "rm -rf lib && tsc"
     },
