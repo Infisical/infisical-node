@@ -9,7 +9,7 @@
 
 ## Links
 
-- [Official SDK docs]()
+- [SDK docs](https://infisical.com/docs/sdk/overview/usage)
 
 ## Installation
 
@@ -21,12 +21,12 @@ $ npm install infisical-node
 
 ```js
 // ES6 syntax
-import infisical from 'infisical-node';
+import infisical from "infisical-node";
 ```
 
 ```js
 // ES5 syntax
-const infisical = require('infisical-node');
+const infisical = require("infisical-node");
 ```
 
 ## Initialization
@@ -38,7 +38,7 @@ Both `connect` and `createConnection` take a parameter `token` and pull in the s
 ```js
 // using async-await (recommended)
 await infisical.connect({
-    token: "your_infisical_token"
+  token: "your_infisical_token",
 });
 ```
 
@@ -65,44 +65,41 @@ infisical.connect({
 
 ```js
 await infisical.connect({
-    token: "your_infisical_token",
-    siteURL: "your_site_url",
-    attachToProcessEnv: true,
-    defaultValues: {
-        "JWT_LIFETIME": "15m"
-    }
+  token: "your_infisical_token",
+  siteURL: "your_site_url",
+  attachToProcessEnv: true,
+  defaultValues: {
+    JWT_LIFETIME: "15m",
+  },
 });
 ```
 
 ## Access a Secret Value
 
 ```js
-const dbURL = infisical.getSecretValue('DB_URL');
+const dbURL = infisical.getSecretValue("DB_URL");
 ```
 
 ## Example with Express
 
 ```js
-const express = require('express');
+const express = require("express");
 const port = 3000;
-const infisical = require('infisical-node');
+const infisical = require("infisical-node");
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
+  // access value
+  const name = infisical.getSecret("NAME");
 
-    // access value
-    const name = infisical.getSecret('NAME');
-
-    res.send(`Hello! My name is: ${name}`);
+  res.send(`Hello! My name is: ${name}`);
 });
 
 app.listen(port, async () => {
-    
-    // initialize client
-    await infisical.connect({
-        token: 'YOUR_INFISICAL_TOKEN'
-    });
+  // initialize client
+  await infisical.connect({
+    token: "YOUR_INFISICAL_TOKEN",
+  });
 
-    console.log(`App listening on port ${port}`)
+  console.log(`App listening on port ${port}`);
 });
 ```
-
