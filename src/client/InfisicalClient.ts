@@ -86,6 +86,18 @@ export class InfisicalClient {
         defaultValues?: { [key: string]: string };
     }) {
         try {
+            this.secrets = defaultValues; 
+            if (attachToProcessEnv) {
+                Object.keys(defaultValues).map((defaultKey) => {
+                    this.secrets[defaultKey] = defaultValues[defaultKey];
+                    process.env[defaultKey] = defaultValues[defaultKey];
+                });
+            } else {
+                Object.keys(defaultValues).map((defaultKey) => {
+                    this.secrets[defaultKey] = defaultValues[defaultKey];
+                });
+            }
+
             // get service token data
             const serviceTokenData = await getServiceTokenData({
                 apiRequest: this.apiRequest
@@ -117,30 +129,19 @@ export class InfisicalClient {
             
             if (attachToProcessEnv) {
                 // case: save secrets and add them to [process.env]
-                this.secrets = defaultValues;
-                Object.keys(defaultValues).map((defaultKey) => {
-                    this.secrets[defaultKey] = defaultValues[defaultKey];
-                    process.env[defaultKey] = defaultValues[defaultKey];
-                });
-
                 Object.keys(secrets).map((key: string) => {
                     this.secrets[key] = secrets[key];
                     process.env[key] = secrets[key]
                 });
             } else {
                 // case: only save secrets
-                this.secrets = defaultValues;
-                Object.keys(defaultValues).map((defaultKey) => {
-                    this.secrets[defaultKey] = defaultValues[defaultKey];
-                });
-
                 Object.keys(secrets).map((key: string) => {
                     this.secrets[key] = secrets[key];
                 });
             }
         } catch (err) {
-            console.log('Failed to set up the Infisical client. Please check that your token is valid and try again.');
             if (this.debug) {
+                console.log('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
                 console.error(err);
             }
         }
