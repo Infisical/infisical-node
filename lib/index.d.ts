@@ -1,2 +1,2 @@
-import { Infisical } from './client/InfisicalClient';
-export default Infisical;
+import { InfisicalClient } from './client/InfisicalClient';
+export declare const Infisical: typeof InfisicalClient;

@@ -9,14 +9,14 @@ import {
 } from '../api';
 import { SecretsObj } from '../types/KeyService';
 
-export class Infisical {
+export class InfisicalClient {
     private workspaceId: string;
     private environment: string;
     private key: string;
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
 
-    public static globalInstance: Infisical;
+    public static globalInstance: InfisicalClient;
 
     constructor({ 
         token, 
@@ -57,7 +57,7 @@ export class Infisical {
         attachToProcessEnv?: boolean;
         defaultValues?: { [key: string]: string };
     }) {
-        const instance = new Infisical({
+        const instance = new InfisicalClient({
             token,
             siteURL
         });
@@ -85,7 +85,7 @@ export class Infisical {
         siteURL?: string;
         defaultValues?: { [key: string]: string };
     }) {
-        const instance = new Infisical({
+        const instance = new InfisicalClient({
             token,
             siteURL
         });
@@ -101,17 +101,12 @@ export class Infisical {
      */
     public async setup({
         attachToProcessEnv = false,
-        defaultValues
+        defaultValues = {}
     }: {
         attachToProcessEnv?: boolean;
         defaultValues?: { [key: string]: string };
     }) {
         try {
-            if (defaultValues) {
-                // case: initialize this.secrets with default values
-                this.secrets = defaultValues;
-            }
-
             // get service token data
             const serviceTokenData = await getServiceTokenData({
                 apiRequest: this.apiRequest
@@ -141,16 +136,25 @@ export class Infisical {
                 workspaceKey
             });
             
-            
-            
             if (attachToProcessEnv) {
                 // case: save secrets and add them to [process.env]
+                this.secrets = defaultValues;
+                Object.keys(defaultValues).map((defaultKey) => {
+                    this.secrets[defaultKey] = defaultValues[defaultKey];
+                    process.env[defaultKey] = defaultValues[defaultKey];
+                });
+
                 Object.keys(secrets).map((key: string) => {
                     this.secrets[key] = secrets[key];
                     process.env[key] = secrets[key]
                 });
             } else {
                 // case: only save secrets
+                this.secrets = defaultValues;
+                Object.keys(defaultValues).map((defaultKey) => {
+                    this.secrets[defaultKey] = defaultValues[defaultKey];
+                });
+
                 Object.keys(secrets).map((key: string) => {
                     this.secrets[key] = secrets[key];
                 });
@@ -185,12 +189,12 @@ export class Infisical {
      */
     public static getSecretValue(key: string): string | undefined {
         let value;
-        if (!Infisical.globalInstance) {
+        if (!InfisicalClient.globalInstance) {
             value = process.env[key];
         } else {
-            value = Infisical.globalInstance.getSecretValue(key); 
+            value = InfisicalClient.globalInstance.getSecretValue(key); 
         }
         
-        return Infisical.globalInstance.getSecretValue(key);
+        return InfisicalClient.globalInstance.getSecretValue(key);
     }
 }

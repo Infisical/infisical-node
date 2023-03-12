@@ -1,3 +1,3 @@
-import { Infisical } from './client/InfisicalClient';
+import { InfisicalClient } from './client/InfisicalClient';
 
-export default Infisical;
+export const Infisical = InfisicalClient;

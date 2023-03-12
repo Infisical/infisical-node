@@ -1,10 +1,10 @@
-export declare class Infisical {
+export declare class InfisicalClient {
     private workspaceId;
     private environment;
     private key;
     private apiRequest;
     private secrets;
-    static globalInstance: Infisical;
+    static globalInstance: InfisicalClient;
     constructor({ token, siteURL }: {
         token: string;
         siteURL: string;
@@ -24,7 +24,7 @@ export declare class Infisical {
         defaultValues?: {
             [key: string]: string;
         };
-    }): Promise<Infisical>;
+    }): Promise<InfisicalClient>;
     /**
      * Connect to Infisical and return a new instance of Infisical
      * @param {Object} options - options for connecting to Infisical
@@ -38,7 +38,7 @@ export declare class Infisical {
         defaultValues?: {
             [key: string]: string;
         };
-    }): Promise<Infisical>;
+    }): Promise<InfisicalClient>;
     /**
      * Sets up the Infisical client by getting data and secrets
      * associated with the instance's Infisical token
