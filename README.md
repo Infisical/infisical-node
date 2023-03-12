@@ -11,7 +11,7 @@ This Node SDK is a work in progress and will go live in the next few days!
 
 ## Links
 
-- Official SDK docs
+- [Official SDK docs]()
 
 ## Installation
 
@@ -67,22 +67,24 @@ const dbURL = infisical.getSecretValue('DB_URL');
 
 ```
 const express = require('express');
+const port = 3000;
 const infisical = require('infisical-node');
 
 app.get('/', (req, res) => {
+
     // access value
     const name = infisical.default.getSecret('NAME');
+
     res.send(`Hello! My name is: ${name}`);
 });
 
 app.listen(port, async () => {
-    console.log(`Example app listening on port ${port}`)
     
     // initialize Infisical client
     await infisical.default.connect({
         token: SERVICE_TOKEN
     });
+
+    console.log(`App listening on port ${port}`)
 });
 ```
-
-

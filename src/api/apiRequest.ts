@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { ApiRequestInterceptorProps } from '../types/api';
+import packageJSON from '../../package.json';
 
 const createApiRequestWithAuthInterceptor = ({ baseURL, serviceToken }: ApiRequestInterceptorProps) => {
     const apiRequest = axios.create({
         baseURL,
         headers: {
-            'Content-Type': ' application/json'
+            'Content-Type': ' application/json',
+            'User-Agent': `InfisicalNodeSDK/${packageJSON.version}`
         }
     });
 
