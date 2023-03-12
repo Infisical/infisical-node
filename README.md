@@ -1,5 +1,7 @@
 <h1 align="center">
-  <img width="300" src="/img/logoname-white.svg#gh-dark-mode-only" alt="infisical">
+    <a href="https://github.com/Infisical/infisical">
+        <img width="300" src="/img/logoname-white.svg#gh-dark-mode-only" alt="infisical">
+    </a>
 </h1>
 <p align="center">
   <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team, devices, and infrastructure.</p>
