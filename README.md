@@ -5,10 +5,6 @@
   <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team, devices, and infrastructure.</p>
 </p>
 
-## Note
-
-This Node SDK is a work in progress and will go live in the next few days!
-
 ## Links
 
 - [Official SDK docs]()
@@ -21,12 +17,12 @@ $ npm install infisical-node
 
 ## Import
 
-```
+```js
 // ES6 syntax
 import infisical from 'infisical-node';
 ```
 
-```
+```js
 // ES5 syntax
 const infisical = require('infisical-node');
 ```
@@ -37,14 +33,14 @@ If your app only needs to connect to one Infisical project, you should use `infi
 
 Both `connect` and `createConnection` take a parameter `token` and pull in the secrets accessible by that Infisical token.
 
-```
+```js
 // using async-await (recommended)
 await infisical.connect({
     token: "your_infisical_token"
 });
 ```
 
-```
+```js
 // using promise chaining
 infisical.connect({
     token: "your_infisical_token"
@@ -57,15 +53,34 @@ infisical.connect({
 })
 ```
 
+### Options
+
+- `siteURL`: Your self-hosted Infisical site URL. Type: `string`. Default: `https://app.infisical.com`.
+- `attachToProcessEnv`: Whether or not to attach fetched secrets to `process.env`. Type: `boolean`. Default: `false`.
+- `defaultValues`: Default values for secrets if they aren't fetched/passed in. Type: `object`. Default: `{}`.
+
+### Example Initialization with Options
+
+```js
+await infisical.connect({
+    token: "your_infisical_token",
+    siteURL: "your_site_url",
+    attachToProcessEnv: true,
+    defaultValues: {
+        "JWT_LIFETIME": "15m"
+    }
+});
+```
+
 ## Access a Secret Value
 
-```
+```js
 const dbURL = infisical.getSecretValue('DB_URL');
 ```
 
 ## Example with Express
 
-```
+```js
 const express = require('express');
 const port = 3000;
 const infisical = require('infisical-node');
@@ -73,7 +88,7 @@ const infisical = require('infisical-node');
 app.get('/', (req, res) => {
 
     // access value
-    const name = infisical.default.getSecret('NAME');
+    const name = infisical.getSecret('NAME');
 
     res.send(`Hello! My name is: ${name}`);
 });
@@ -81,12 +96,11 @@ app.get('/', (req, res) => {
 app.listen(port, async () => {
     
     // initialize client
-    await infisical.default.connect({
-        token: SERVICE_TOKEN
+    await infisical.connect({
+        token: 'YOUR_INFISICAL_TOKEN'
     });
 
     console.log(`App listening on port ${port}`)
 });
 ```
 
-## TODO: additional options
