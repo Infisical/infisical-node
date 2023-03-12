@@ -4,14 +4,12 @@ export declare class InfisicalClient {
     private key;
     private apiRequest;
     private secrets;
-    static globalInstance: InfisicalClient;
     constructor({ token, siteURL }: {
         token: string;
         siteURL: string;
     });
     /**
      * Connect to Infisical and return a new instance of Infisical
-     * This method also sets up the global instance to be accessed anywhere else in an app.
      * @param {Object} options - options for connecting to Infisical
      * @param {String} token - the Infisical Token to use to connect to Infisical
      * @param {String} siteURL - the URL of Infisical to connect to
@@ -21,20 +19,6 @@ export declare class InfisicalClient {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        defaultValues?: {
-            [key: string]: string;
-        };
-    }): Promise<InfisicalClient>;
-    /**
-     * Connect to Infisical and return a new instance of Infisical
-     * @param {Object} options - options for connecting to Infisical
-     * @param {String} token - the Infisical Token to use to connect to Infisical
-     * @param {String} siteURL - the URL of Infisical to connect to
-     * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
-     */
-    static createConnection({ token, siteURL, defaultValues }: {
-        token: string;
-        siteURL?: string;
         defaultValues?: {
             [key: string]: string;
         };
@@ -55,10 +39,4 @@ export declare class InfisicalClient {
      * @returns {String} value - value of secret
      */
     getSecretValue(key: string): string | undefined;
-    /**
-     * Return value for secret with key [key] from global instance
-     * @param {String} key - key of secret
-     * @returns {String} value - value of secret
-     */
-    static getSecretValue(key: string): string | undefined;
 }

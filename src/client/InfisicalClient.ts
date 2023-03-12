@@ -16,8 +16,6 @@ export class InfisicalClient {
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
 
-    public static globalInstance: InfisicalClient;
-
     constructor({ 
         token, 
         siteURL = INFISICAL_URL 
@@ -40,7 +38,6 @@ export class InfisicalClient {
     
     /**
      * Connect to Infisical and return a new instance of Infisical
-     * This method also sets up the global instance to be accessed anywhere else in an app.
      * @param {Object} options - options for connecting to Infisical
      * @param {String} token - the Infisical Token to use to connect to Infisical
      * @param {String} siteURL - the URL of Infisical to connect to
@@ -61,39 +58,40 @@ export class InfisicalClient {
             token,
             siteURL
         });
+
         await instance.setup({
             attachToProcessEnv,
             defaultValues
         });
-        this.globalInstance = instance;
+
         return instance;
     }
     
-    /**
-     * Connect to Infisical and return a new instance of Infisical
-     * @param {Object} options - options for connecting to Infisical
-     * @param {String} token - the Infisical Token to use to connect to Infisical
-     * @param {String} siteURL - the URL of Infisical to connect to
-     * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
-     */
-    public static async createConnection({ 
-        token, 
-        siteURL = INFISICAL_URL,
-        defaultValues = {}
-    }: {
-        token: string;
-        siteURL?: string;
-        defaultValues?: { [key: string]: string };
-    }) {
-        const instance = new InfisicalClient({
-            token,
-            siteURL
-        });
-        await instance.setup({
-            defaultValues
-        });
-        return instance;
-    };
+    // /**
+    //  * Connect to Infisical and return a new instance of Infisical
+    //  * @param {Object} options - options for connecting to Infisical
+    //  * @param {String} token - the Infisical Token to use to connect to Infisical
+    //  * @param {String} siteURL - the URL of Infisical to connect to
+    //  * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
+    //  */
+    // public static async createConnection({ 
+    //     token, 
+    //     siteURL = INFISICAL_URL,
+    //     defaultValues = {}
+    // }: {
+    //     token: string;
+    //     siteURL?: string;
+    //     defaultValues?: { [key: string]: string };
+    // }) {
+    //     const instance = new InfisicalClient({
+    //         token,
+    //         siteURL
+    //     });
+    //     await instance.setup({
+    //         defaultValues
+    //     });
+    //     return instance;
+    // };
     
     /**
      * Sets up the Infisical client by getting data and secrets 
@@ -180,21 +178,5 @@ export class InfisicalClient {
         }
         
         return value;
-    }
-
-    /**
-     * Return value for secret with key [key] from global instance
-     * @param {String} key - key of secret
-     * @returns {String} value - value of secret
-     */
-    public static getSecretValue(key: string): string | undefined {
-        let value;
-        if (!InfisicalClient.globalInstance) {
-            value = process.env[key];
-        } else {
-            value = InfisicalClient.globalInstance.getSecretValue(key); 
-        }
-        
-        return InfisicalClient.globalInstance.getSecretValue(key);
     }
 }
