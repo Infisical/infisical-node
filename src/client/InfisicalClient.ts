@@ -15,13 +15,16 @@ export class InfisicalClient {
     private key: string;
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
+    private debug: boolean = false;
 
     constructor({ 
         token, 
-        siteURL = INFISICAL_URL 
+        siteURL = INFISICAL_URL,
+        debug = false
     }: {
         token: string;
         siteURL: string;
+        debug: boolean;
     }) {
         const lastDotIdx = token.lastIndexOf('.');
         const serviceToken = token.substring(0, lastDotIdx);
@@ -34,6 +37,7 @@ export class InfisicalClient {
         this.key = key;
         this.workspaceId = '';
         this.environment = '';
+        this.debug = debug;
     }
     
     /**
@@ -47,16 +51,19 @@ export class InfisicalClient {
         token,
         siteURL = INFISICAL_URL,
         attachToProcessEnv = false,
-        defaultValues = {}
+        defaultValues = {},
+        debug = false
     }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
         defaultValues?: { [key: string]: string };
+        debug?: boolean;
     }) {
         const instance = new InfisicalClient({
             token,
-            siteURL
+            siteURL,
+            debug
         });
 
         await instance.setup({
@@ -66,32 +73,6 @@ export class InfisicalClient {
 
         return instance;
     }
-    
-    // /**
-    //  * Connect to Infisical and return a new instance of Infisical
-    //  * @param {Object} options - options for connecting to Infisical
-    //  * @param {String} token - the Infisical Token to use to connect to Infisical
-    //  * @param {String} siteURL - the URL of Infisical to connect to
-    //  * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
-    //  */
-    // public static async createConnection({ 
-    //     token, 
-    //     siteURL = INFISICAL_URL,
-    //     defaultValues = {}
-    // }: {
-    //     token: string;
-    //     siteURL?: string;
-    //     defaultValues?: { [key: string]: string };
-    // }) {
-    //     const instance = new InfisicalClient({
-    //         token,
-    //         siteURL
-    //     });
-    //     await instance.setup({
-    //         defaultValues
-    //     });
-    //     return instance;
-    // };
     
     /**
      * Sets up the Infisical client by getting data and secrets 
@@ -159,7 +140,9 @@ export class InfisicalClient {
             }
         } catch (err) {
             console.log('Failed to set up the Infisical client. Please check that your token is valid and try again.');
-            console.error(err);
+            if (this.debug) {
+                console.error(err);
+            }
         }
     }
 

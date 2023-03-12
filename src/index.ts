@@ -6,18 +6,21 @@ const connect = async ({
     token,
     siteURL,
     attachToProcessEnv,
-    defaultValues
+    defaultValues,
+    debug
 }: {
     token: string;
     siteURL?: string;
     attachToProcessEnv?: boolean;
     defaultValues?: { [key: string]: string };
+    debug?: boolean;
 }) => {
     const instance = await InfisicalClient.connect({
         token,
         siteURL,
         attachToProcessEnv,
-        defaultValues
+        defaultValues,
+        debug
     });
 
     globalInstance = instance;
@@ -27,16 +30,19 @@ const connect = async ({
 const createConnection = async ({
     token,
     siteURL,
-    defaultValues
+    defaultValues,
+    debug
 }: {
     token: string;
     siteURL?: string;
     defaultValues?: { [key: string]: string };
+    debug?: boolean;
 }) => {
     const instance = await InfisicalClient.connect({
         token,
         siteURL,
-        defaultValues
+        defaultValues,
+        debug
     });
 
     return instance;

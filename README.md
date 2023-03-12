@@ -60,6 +60,7 @@ infisical.connect({
 - `siteURL`: Your self-hosted Infisical site URL. Type: `string`. Default: `https://app.infisical.com`.
 - `attachToProcessEnv`: Whether or not to attach fetched secrets to `process.env`. Type: `boolean`. Default: `false`.
 - `defaultValues`: Default values for secrets if they aren't fetched/passed in. Type: `object`. Default: `{}`.
+- `debug`: Turns debug mode on or off. If debug mode is enabled then the SDK will attempt to print out useful debugging information. Type: `boolean`. Default: `false`.
 
 ### Example Initialization with Options
 
