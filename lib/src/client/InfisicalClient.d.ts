@@ -1,4 +1,3 @@
-import { ClientParamType } from '../types/InfisicalClient';
 export declare class Infisical {
     private workspaceId;
     private environment;
@@ -6,7 +5,10 @@ export declare class Infisical {
     private apiRequest;
     private secrets;
     static globalInstance: Infisical;
-    constructor({ token, siteURL }: ClientParamType);
+    constructor({ token, siteURL }: {
+        token: string;
+        siteURL: string;
+    });
     /**
      * Connect to Infisical and return a new instance of Infisical
      * This method also sets up the global instance to be accessed anywhere else in an app.
@@ -15,10 +17,13 @@ export declare class Infisical {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    static connect({ token, siteURL, attachToProcessEnv }: {
+    static connect({ token, siteURL, attachToProcessEnv, defaultValues }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
+        defaultValues?: {
+            [key: string]: string;
+        };
     }): Promise<Infisical>;
     /**
      * Connect to Infisical and return a new instance of Infisical
@@ -27,24 +32,33 @@ export declare class Infisical {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    static createConnection({ token, siteURL }: ClientParamType): Promise<Infisical>;
+    static createConnection({ token, siteURL, defaultValues }: {
+        token: string;
+        siteURL?: string;
+        defaultValues?: {
+            [key: string]: string;
+        };
+    }): Promise<Infisical>;
     /**
      * Sets up the Infisical client by getting data and secrets
      * associated with the instance's Infisical token
      */
-    setup({ attachToProcessEnv }: {
+    setup({ attachToProcessEnv, defaultValues }: {
         attachToProcessEnv?: boolean;
+        defaultValues?: {
+            [key: string]: string;
+        };
     }): Promise<void>;
     /**
      * Return value for secret with key [key] for an instance of Infisical
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    getSecret(key: string): string | undefined;
+    getSecretValue(key: string): string | undefined;
     /**
      * Return value for secret with key [key] from global instance
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    static getSecret(key: string): string | undefined;
+    static getSecretValue(key: string): string | undefined;
 }

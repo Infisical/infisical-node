@@ -35,19 +35,19 @@ const infisical = require('infisical-node');
 
 If your app only needs to connect to one Infisical project, you should use `infisical.connect`. If you need to connect to multiple Infisical projects, use `infisical.createConnection`.
 
-Both `connect` and `createConnection` take a parameter `serviceToken` and pull in the secrets accessible by that Infisical service token.
+Both `connect` and `createConnection` take a parameter `token` and pull in the secrets accessible by that Infisical token.
 
 ```
-// using async-await
+// using async-await (recommended)
 await infisical.connect({
-    token: "your_service_token"
+    token: "your_infisical_token"
 });
 ```
 
 ```
 // using promise chaining
 infisical.connect({
-    token: "your_service_token"
+    token: "your_infisical_token"
 })
 .then(() => {
     console.log('Success!)
@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
 
 app.listen(port, async () => {
     
-    // initialize Infisical client
+    // initialize client
     await infisical.default.connect({
         token: SERVICE_TOKEN
     });
@@ -88,3 +88,5 @@ app.listen(port, async () => {
     console.log(`App listening on port ${port}`)
 });
 ```
+
+## TODO: additional options

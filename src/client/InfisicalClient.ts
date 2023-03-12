@@ -8,18 +8,23 @@ import {
     getSecrets
 } from '../api';
 import { SecretsObj } from '../types/KeyService';
-import { ClientParamType } from '../types/InfisicalClient';
 
 export class Infisical {
     private workspaceId: string;
     private environment: string;
     private key: string;
     private apiRequest: AxiosInstance;
-    private secrets: SecretsObj | null = null
+    private secrets: SecretsObj = {};
 
     public static globalInstance: Infisical;
 
-    constructor({ token, siteURL = INFISICAL_URL }: ClientParamType) {
+    constructor({ 
+        token, 
+        siteURL = INFISICAL_URL 
+    }: {
+        token: string;
+        siteURL: string;
+    }) {
         const lastDotIdx = token.lastIndexOf('.');
         const serviceToken = token.substring(0, lastDotIdx);
         const key = token.substring(lastDotIdx + 1);
@@ -44,18 +49,21 @@ export class Infisical {
     public static async connect({
         token,
         siteURL = INFISICAL_URL,
-        attachToProcessEnv = false
+        attachToProcessEnv = false,
+        defaultValues = {}
     }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
+        defaultValues?: { [key: string]: string };
     }) {
         const instance = new Infisical({
             token,
             siteURL
         });
         await instance.setup({
-            attachToProcessEnv
+            attachToProcessEnv,
+            defaultValues
         });
         this.globalInstance = instance;
         return instance;
@@ -68,12 +76,22 @@ export class Infisical {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    public static async createConnection({ token, siteURL = INFISICAL_URL }: ClientParamType) {
+    public static async createConnection({ 
+        token, 
+        siteURL = INFISICAL_URL,
+        defaultValues = {}
+    }: {
+        token: string;
+        siteURL?: string;
+        defaultValues?: { [key: string]: string };
+    }) {
         const instance = new Infisical({
             token,
             siteURL
         });
-        await instance.setup({});
+        await instance.setup({
+            defaultValues
+        });
         return instance;
     };
     
@@ -82,11 +100,18 @@ export class Infisical {
      * associated with the instance's Infisical token
      */
     public async setup({
-        attachToProcessEnv= false
+        attachToProcessEnv = false,
+        defaultValues
     }: {
         attachToProcessEnv?: boolean;
+        defaultValues?: { [key: string]: string };
     }) {
         try {
+            if (defaultValues) {
+                // case: initialize this.secrets with default values
+                this.secrets = defaultValues;
+            }
+
             // get service token data
             const serviceTokenData = await getServiceTokenData({
                 apiRequest: this.apiRequest
@@ -116,17 +141,22 @@ export class Infisical {
                 workspaceKey
             });
             
-            this.secrets = secrets;
+            
             
             if (attachToProcessEnv) {
-                // case: add secrets to [process.env]
+                // case: save secrets and add them to [process.env]
                 Object.keys(secrets).map((key: string) => {
+                    this.secrets[key] = secrets[key];
                     process.env[key] = secrets[key]
                 });
+            } else {
+                // case: only save secrets
+                Object.keys(secrets).map((key: string) => {
+                    this.secrets[key] = secrets[key];
+                });
             }
-            
         } catch (err) {
-            console.log('Failed to set up the Infisical client. Please check that your token is valid.');
+            console.log('Failed to set up the Infisical client. Please check that your token is valid and try again.');
             console.error(err);
         }
     }
@@ -136,7 +166,7 @@ export class Infisical {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public getSecret(key: string): string | undefined {
+    public getSecretValue(key: string): string | undefined {
         let value;
 
         if (this.secrets?.[key]) {
@@ -153,14 +183,14 @@ export class Infisical {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public static getSecret(key: string): string | undefined {
+    public static getSecretValue(key: string): string | undefined {
         let value;
         if (!Infisical.globalInstance) {
             value = process.env[key];
         } else {
-            value = Infisical.globalInstance.getSecret(key); 
+            value = Infisical.globalInstance.getSecretValue(key); 
         }
         
-        return Infisical.globalInstance.getSecret(key);
+        return Infisical.globalInstance.getSecretValue(key);
     }
 }
