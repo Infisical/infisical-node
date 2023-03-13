@@ -99,8 +99,8 @@ export class InfisicalClient {
 
         } catch (err) {
             if (this.debug) {
-                console.log('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
                 console.error(err);
+                console.log('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
             }
         }
     }
@@ -118,6 +118,10 @@ export class InfisicalClient {
         } else {
             value = process.env[key];
         }
+        
+        console.log('this debug: ', this.debug);
+        console.log('key: ', key);
+        console.log('value undefined: ', value === undefined);
         
         if (value === undefined && this.debug) {
            console.log(`Error: Missing value for '${key}'. Please check your configuration.`);
