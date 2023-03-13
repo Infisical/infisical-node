@@ -119,6 +119,10 @@ export class InfisicalClient {
             value = process.env[key];
         }
         
+        if (value === undefined && this.debug) {
+           console.log(`Error: Missing value for '${key}'. Please check your configuration.`);
+        }
+        
         return value;
     }
 }
