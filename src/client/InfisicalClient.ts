@@ -65,6 +65,10 @@ export class InfisicalClient {
             attachToProcessEnv
         });
 
+        console.log('Connected A');
+        if (debug) {
+            console.log('Connected');
+        }
         return instance;
     }
     
@@ -118,10 +122,6 @@ export class InfisicalClient {
         } else {
             value = process.env[key];
         }
-        
-        console.log('this debug: ', this.debug);
-        console.log('key: ', key);
-        console.log('value undefined: ', value === undefined);
         
         if (value === undefined && this.debug) {
            console.log(`Error: Missing value for '${key}'. Please check your configuration.`);
