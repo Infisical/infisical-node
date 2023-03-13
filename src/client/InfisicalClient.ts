@@ -65,10 +65,6 @@ export class InfisicalClient {
             attachToProcessEnv
         });
 
-        console.log('Connected A');
-        if (debug) {
-            console.log('Connected');
-        }
         return instance;
     }
     
@@ -101,6 +97,7 @@ export class InfisicalClient {
                 }
             });
 
+            console.log('Connected to Infisical');
         } catch (err) {
             if (this.debug) {
                 console.error(err);
