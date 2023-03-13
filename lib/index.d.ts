@@ -12,7 +12,7 @@ export declare const connect: ({ token, siteURL, attachToProcessEnv, debug, conf
         };
     } | undefined;
 }) => Promise<InfisicalClient>;
-export declare const createConnection: ({ token, siteURL, defaultValues, debug, config }: {
+export declare const createConnection: ({ token, siteURL, defaultValues, debug }: {
     token: string;
     siteURL?: string | undefined;
     defaultValues?: {
@@ -27,7 +27,7 @@ export declare const createConnection: ({ token, siteURL, defaultValues, debug, 
         };
     } | undefined;
 }) => Promise<InfisicalClient>;
-export declare const getSecretValue: (key: string) => string | number | boolean | Date | undefined;
+export declare const get: (key: string) => string | number | boolean | Date | undefined;
 declare const _default: {
     connect: ({ token, siteURL, attachToProcessEnv, debug, config }: {
         token: string;
@@ -42,7 +42,7 @@ declare const _default: {
             };
         } | undefined;
     }) => Promise<InfisicalClient>;
-    createConnection: ({ token, siteURL, defaultValues, debug, config }: {
+    createConnection: ({ token, siteURL, defaultValues, debug }: {
         token: string;
         siteURL?: string | undefined;
         defaultValues?: {
@@ -57,6 +57,6 @@ declare const _default: {
             };
         } | undefined;
     }) => Promise<InfisicalClient>;
-    getSecretValue: (key: string) => string | number | boolean | Date | undefined;
+    get: (key: string) => string | number | boolean | Date | undefined;
 };
 export default _default;

@@ -5,6 +5,7 @@ export declare class InfisicalClient {
     private apiRequest;
     private secrets;
     private debug;
+    private config;
     constructor({ token, siteURL, debug }: {
         token: string;
         siteURL: string;
@@ -49,5 +50,5 @@ export declare class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    getSecretValue(key: string): string | number | boolean | Date | undefined;
+    get(key: string): string | number | boolean | Date | undefined;
 }

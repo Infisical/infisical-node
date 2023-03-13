@@ -14,6 +14,13 @@ export class InfisicalClient {
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
     private debug: boolean = false;
+    private config: {
+            [key: string]: {
+                format: 'string' | 'boolean' | 'number' | 'date';
+                default?: string | boolean | number | Date | undefined;
+                required?: boolean;
+            }
+        } = {};
 
     constructor({ 
         token, 
@@ -96,6 +103,7 @@ export class InfisicalClient {
         }
     }) {
         try {
+            this.config = config;
             
             // get service token data and secrets
             const { serviceTokenData, secrets } = await SecretService.getDecryptedDetails({
@@ -172,13 +180,26 @@ export class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public getSecretValue(key: string): string | number | boolean | Date | undefined {
+    public get(key: string): string | number | boolean | Date | undefined {
         let value;
 
         if (this.secrets?.[key]) {
             value = this.secrets[key];
         } else {
             value = process.env[key];
+        }
+
+        if (key in this.config) {
+            const returnType = this.config[key].format;
+            if (returnType === 'number') {
+                value = Number(value);
+            } else if (returnType === 'boolean') {
+                value = Boolean(value);
+            } else if (returnType === 'date') {
+                if (typeof value === 'string') {
+                    value = new Date(value);
+                }
+            }
         }
         
         return value;

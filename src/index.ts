@@ -36,8 +36,7 @@ export const createConnection = async ({
     token,
     siteURL,
     defaultValues,
-    debug,
-    config
+    debug
 }: {
     token: string;
     siteURL?: string;
@@ -60,9 +59,9 @@ export const createConnection = async ({
     return instance;
 }
 
-export const getSecretValue = (key: string): string | number | boolean | Date | undefined => {
+export const get = (key: string): string | number | boolean | Date | undefined => {
     if (globalInstance) {
-        return globalInstance.getSecretValue(key);
+        return globalInstance.get(key);
     }
 
     return undefined;
@@ -71,5 +70,5 @@ export const getSecretValue = (key: string): string | number | boolean | Date | 
 export default ({
     connect,
     createConnection,
-    getSecretValue
+    get
 });
