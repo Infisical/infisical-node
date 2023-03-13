@@ -55,3 +55,9 @@ export const getSecretValue = (key: string): string | undefined => {
 
     return undefined;
 }
+
+export default ({
+    connect,
+    createConnection,
+    getSecretValue
+});
