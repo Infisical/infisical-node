@@ -12,7 +12,7 @@ export const connect = async ({
     token: string;
     siteURL?: string;
     attachToProcessEnv?: boolean;
-    defaultValues?: { [key: string]: string };
+    defaultValues?: { [key: string]: any };
     debug?: boolean;
 }) => {
     const instance = await InfisicalClient.connect({
@@ -35,7 +35,7 @@ export const createConnection = async ({
 }: {
     token: string;
     siteURL?: string;
-    defaultValues?: { [key: string]: string };
+    defaultValues?: { [key: string]: any };
     debug?: boolean;
 }) => {
     const instance = await InfisicalClient.connect({

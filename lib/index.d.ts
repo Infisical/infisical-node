@@ -4,7 +4,7 @@ export declare const connect: ({ token, siteURL, attachToProcessEnv, defaultValu
     siteURL?: string | undefined;
     attachToProcessEnv?: boolean | undefined;
     defaultValues?: {
-        [key: string]: string;
+        [key: string]: any;
     } | undefined;
     debug?: boolean | undefined;
 }) => Promise<InfisicalClient>;
@@ -12,7 +12,7 @@ export declare const createConnection: ({ token, siteURL, defaultValues, debug }
     token: string;
     siteURL?: string | undefined;
     defaultValues?: {
-        [key: string]: string;
+        [key: string]: any;
     } | undefined;
     debug?: boolean | undefined;
 }) => Promise<InfisicalClient>;
@@ -23,7 +23,7 @@ declare const _default: {
         siteURL?: string | undefined;
         attachToProcessEnv?: boolean | undefined;
         defaultValues?: {
-            [key: string]: string;
+            [key: string]: any;
         } | undefined;
         debug?: boolean | undefined;
     }) => Promise<InfisicalClient>;
@@ -31,7 +31,7 @@ declare const _default: {
         token: string;
         siteURL?: string | undefined;
         defaultValues?: {
-            [key: string]: string;
+            [key: string]: any;
         } | undefined;
         debug?: boolean | undefined;
     }) => Promise<InfisicalClient>;

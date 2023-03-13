@@ -22,7 +22,7 @@ export declare class InfisicalClient {
         siteURL?: string;
         attachToProcessEnv?: boolean;
         defaultValues?: {
-            [key: string]: string;
+            [key: string]: any;
         };
         debug?: boolean;
     }): Promise<InfisicalClient>;
@@ -33,7 +33,7 @@ export declare class InfisicalClient {
     setup({ attachToProcessEnv, defaultValues }: {
         attachToProcessEnv?: boolean;
         defaultValues?: {
-            [key: string]: string;
+            [key: string]: any;
         };
     }): Promise<void>;
     /**

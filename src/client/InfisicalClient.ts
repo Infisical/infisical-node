@@ -57,7 +57,7 @@ export class InfisicalClient {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        defaultValues?: { [key: string]: string };
+        defaultValues?: { [key: string]: any };
         debug?: boolean;
     }) {
         const instance = new InfisicalClient({
@@ -83,7 +83,7 @@ export class InfisicalClient {
         defaultValues = {}
     }: {
         attachToProcessEnv?: boolean;
-        defaultValues?: { [key: string]: string };
+        defaultValues?: { [key: string]: any };
     }) {
         try {
             this.secrets = defaultValues; 
