@@ -44,7 +44,7 @@ export const createConnection = async ({
     return instance;
 }
 
-export const get = (key: string): string | number | boolean | Date | undefined => {
+export const get = (key: string): string | undefined => {
     if (globalInstance) {
         return globalInstance.get(key);
     }

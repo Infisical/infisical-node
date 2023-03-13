@@ -13,7 +13,7 @@ export declare const createConnection: ({ token, siteURL, defaultValues, debug }
     } | undefined;
     debug?: boolean | undefined;
 }) => Promise<InfisicalClient>;
-export declare const get: (key: string) => string | number | boolean | Date | undefined;
+export declare const get: (key: string) => string | undefined;
 declare const _default: {
     connect: ({ token, siteURL, attachToProcessEnv, debug, }: {
         token: string;
@@ -29,6 +29,6 @@ declare const _default: {
         } | undefined;
         debug?: boolean | undefined;
     }) => Promise<InfisicalClient>;
-    get: (key: string) => string | number | boolean | Date | undefined;
+    get: (key: string) => string | undefined;
 };
 export default _default;
