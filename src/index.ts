@@ -1,5 +1,4 @@
 import { InfisicalClient } from './client/InfisicalClient';
-import { IConfig } from './interfaces/client';
 
 let globalInstance: InfisicalClient;
 
@@ -8,13 +7,11 @@ export const connect = async ({
     siteURL,
     attachToProcessEnv,
     debug,
-    config
 }: {
     token: string;
     siteURL?: string;
     attachToProcessEnv?: boolean;
     debug?: boolean;
-    config?: IConfig;
 }) => {
     const instance = await InfisicalClient.connect({
         token,
@@ -37,7 +34,6 @@ export const createConnection = async ({
     siteURL?: string;
     defaultValues?: { [key: string]: any };
     debug?: boolean;
-    config?: IConfig;
 }) => {
     const instance = await InfisicalClient.connect({
         token,

@@ -6,7 +6,7 @@ export interface DecryptSecrets {
 }
 
 export interface SecretsObj {
-    [key: string]: string | boolean | number | Date | undefined;
+    [key: string]: string;
 }
 
 export { Secret };

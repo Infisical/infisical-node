@@ -5,8 +5,6 @@ import {
 } from '../api';
 import { SecretsObj } from '../types/KeyService';
 import SecretService from '../services/SecretService';
-import { castValueToFormat, validateValueFormat } from '../helpers';
-import { IConfig } from '../interfaces/client';
 
 export class InfisicalClient {
     private workspaceId: string;
@@ -15,7 +13,6 @@ export class InfisicalClient {
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
     private debug: boolean = false;
-    private config: IConfig = {};
 
     constructor({ 
         token, 
@@ -51,13 +48,11 @@ export class InfisicalClient {
         token,
         siteURL = INFISICAL_URL,
         attachToProcessEnv = false,
-        config = {},
         debug = false
     }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        config?: IConfig;
         debug?: boolean;
     }) {
         const instance = new InfisicalClient({
@@ -67,8 +62,7 @@ export class InfisicalClient {
         });
 
         await instance.setup({
-            attachToProcessEnv,
-            config
+            attachToProcessEnv
         });
 
         return instance;
@@ -80,13 +74,10 @@ export class InfisicalClient {
      */
     public async setup({
         attachToProcessEnv = false,
-        config = {}
     }: {
         attachToProcessEnv?: boolean;
-        config?: IConfig;
     }) {
         try {
-            this.config = config;
             
             // get service token data and secrets
             const { serviceTokenData, secrets } = await SecretService.getDecryptedDetails({
@@ -96,54 +87,10 @@ export class InfisicalClient {
             
             this.workspaceId = serviceTokenData.workspace;
             this.environment = serviceTokenData.environment;
-
-            // set secrets based on default config values
-            Object.keys(config).map((key) => {
-                if (config[key]?.default) {
-                    // case: config has a default value
-                    
-                    validateValueFormat({
-                        key,
-                        value: config[key].default,
-                        format: config[key].format,
-                        isDefault: true
-                    });
-
-                    this.secrets[key] = config[key].default;
-                    if (attachToProcessEnv) {
-                        process.env[key] = String(secrets[key]);
-                    }
-                }
-                
-                if (config[key]?.required) {
-                    // case: config is required
-                    
-                    if (
-                        config[key]?.default !== undefined 
-                        && secrets[key] !== undefined
-                        && process.env[key] !== undefined
-                    ) {
-                        throw new Error(`Expected ${key} but it is undefined / not found`)
-                    }
-                }
-            });
             
             // set secrets based on fetched secrets
             Object.keys(secrets).map((key) => {
-                let v: string | boolean | number | Date = secrets[key];
-                if (key in config) {
-                    // case: pulled key is in config
-                    
-                    if (config[key]?.format) {
-                        // case: config has a format specified
-                        v = castValueToFormat({
-                            value: secrets[key],
-                            format: config[key].format
-                        });
-                    }
-                }
-                
-                this.secrets[key] = v;
+                this.secrets[key] = secrets[key];
 
                 if (attachToProcessEnv) {
                     process.env[key] = String(secrets[key]);
@@ -163,26 +110,13 @@ export class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public get<T extends keyof IConfig>(key: T): string | number | boolean | Date | undefined {
+    public get(key: string): string | undefined {
         let value;
 
         if (this.secrets[key]) {
             value = this.secrets[key];
         } else {
             value = process.env[key];
-        }
-
-        if (key in this.config) {
-            const format = this.config[key].format;
-            if (format === 'number') {
-                value = Number(value);
-            } else if (format === 'boolean') {
-                value = Boolean(value);
-            } else if (format === 'date') {
-                if (typeof value === 'string') {
-                    value = new Date(value);
-                }
-            }
         }
         
         return value;
