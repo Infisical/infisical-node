@@ -6,20 +6,25 @@ export const connect = async ({
     token,
     siteURL,
     attachToProcessEnv,
-    defaultValues,
-    debug
+    debug,
+    config
 }: {
     token: string;
     siteURL?: string;
     attachToProcessEnv?: boolean;
-    defaultValues?: { [key: string]: any };
     debug?: boolean;
+    config?: {
+        [key: string]: {
+            format: 'string' | 'boolean' | 'number' | 'date';
+            default?: string | boolean | number | Date | undefined;
+            required?: boolean;
+        }
+    }
 }) => {
     const instance = await InfisicalClient.connect({
         token,
         siteURL,
         attachToProcessEnv,
-        defaultValues,
         debug
     });
 
@@ -31,24 +36,31 @@ export const createConnection = async ({
     token,
     siteURL,
     defaultValues,
-    debug
+    debug,
+    config
 }: {
     token: string;
     siteURL?: string;
     defaultValues?: { [key: string]: any };
     debug?: boolean;
+    config?: {
+        [key: string]: {
+            format: 'string' | 'boolean' | 'number' | 'date';
+            default?: string | boolean | number | Date | undefined;
+            required?: boolean;
+        }
+    }
 }) => {
     const instance = await InfisicalClient.connect({
         token,
         siteURL,
-        defaultValues,
         debug
     });
 
     return instance;
 }
 
-export const getSecretValue = (key: string): string | undefined => {
+export const getSecretValue = (key: string): string | number | boolean | Date | undefined => {
     if (globalInstance) {
         return globalInstance.getSecretValue(key);
     }

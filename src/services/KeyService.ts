@@ -7,7 +7,7 @@ import { decryptSymmetric } from '../utils/crypto';
 export default class KeyService {
     static decryptSecrets({ encryptedSecrets, workspaceKey }: DecryptSecrets) {
         // console.log('encryptedSecrets', encryptedSecrets);
-        let secretsObj: SecretsObj = {};
+        let secretsObj: { [key: string]: string } = {};
         
         // decrypt secret keys, values, and comments
         encryptedSecrets.forEach((encryptedSecret: Secret) => {

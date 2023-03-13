@@ -17,12 +17,16 @@ export declare class InfisicalClient {
      * @param {String} siteURL - the URL of Infisical to connect to
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
-    static connect({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
+    static connect({ token, siteURL, attachToProcessEnv, config, debug }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        defaultValues?: {
-            [key: string]: any;
+        config?: {
+            [key: string]: {
+                format: 'string' | 'boolean' | 'number' | 'date';
+                default?: string | boolean | number | Date | undefined;
+                required?: boolean;
+            };
         };
         debug?: boolean;
     }): Promise<InfisicalClient>;
@@ -30,10 +34,14 @@ export declare class InfisicalClient {
      * Sets up the Infisical client by getting data and secrets
      * associated with the instance's Infisical token
      */
-    setup({ attachToProcessEnv, defaultValues }: {
+    setup({ attachToProcessEnv, config }: {
         attachToProcessEnv?: boolean;
-        defaultValues?: {
-            [key: string]: any;
+        config?: {
+            [key: string]: {
+                format: 'string' | 'boolean' | 'number' | 'date';
+                default?: string | boolean | number | Date | undefined;
+                required?: boolean;
+            };
         };
     }): Promise<void>;
     /**
@@ -41,5 +49,5 @@ export declare class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    getSecretValue(key: string): string | undefined;
+    getSecretValue(key: string): string | number | boolean | Date | undefined;
 }

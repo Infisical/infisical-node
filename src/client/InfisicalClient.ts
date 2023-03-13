@@ -1,13 +1,11 @@
 import { AxiosInstance } from 'axios';
-import { KeyService } from '../services';
-import { decryptSymmetric } from '../utils/crypto';
 import { INFISICAL_URL } from '../variables';
 import {
-    createApiRequestWithAuthInterceptor,
-    getServiceTokenData,
-    getSecrets
+    createApiRequestWithAuthInterceptor
 } from '../api';
 import { SecretsObj } from '../types/KeyService';
+import SecretService from '../services/SecretService';
+import { castValueToFormat, validateValueFormat } from '../helpers';
 
 export class InfisicalClient {
     private workspaceId: string;
@@ -51,13 +49,19 @@ export class InfisicalClient {
         token,
         siteURL = INFISICAL_URL,
         attachToProcessEnv = false,
-        defaultValues = {},
+        config = {},
         debug = false
     }: {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        defaultValues?: { [key: string]: any };
+        config?: {
+            [key: string]: {
+                format: 'string' | 'boolean' | 'number' | 'date';
+                default?: string | boolean | number | Date | undefined;
+                required?: boolean;
+            }
+        }
         debug?: boolean;
     }) {
         const instance = new InfisicalClient({
@@ -68,7 +72,7 @@ export class InfisicalClient {
 
         await instance.setup({
             attachToProcessEnv,
-            defaultValues
+            config
         });
 
         return instance;
@@ -80,65 +84,81 @@ export class InfisicalClient {
      */
     public async setup({
         attachToProcessEnv = false,
-        defaultValues = {}
+        config = {}
     }: {
         attachToProcessEnv?: boolean;
-        defaultValues?: { [key: string]: any };
+        config?: {
+            [key: string]: {
+                format: 'string' | 'boolean' | 'number' | 'date';
+                default?: string | boolean | number | Date | undefined;
+                required?: boolean;
+            }
+        }
     }) {
         try {
-            this.secrets = defaultValues; 
-            if (attachToProcessEnv) {
-                Object.keys(defaultValues).map((defaultKey) => {
-                    this.secrets[defaultKey] = defaultValues[defaultKey];
-                    process.env[defaultKey] = defaultValues[defaultKey];
-                });
-            } else {
-                Object.keys(defaultValues).map((defaultKey) => {
-                    this.secrets[defaultKey] = defaultValues[defaultKey];
-                });
-            }
-
-            // get service token data
-            const serviceTokenData = await getServiceTokenData({
-                apiRequest: this.apiRequest
-            });
-
-            // get secrets
-            const encryptedSecrets = await getSecrets({
+            
+            // get service token data and secrets
+            const { serviceTokenData, secrets } = await SecretService.getDecryptedDetails({
                 apiRequest: this.apiRequest,
-                workspaceId: serviceTokenData.workspace,
-                environment: serviceTokenData.environment
-            });
-
-            this.workspaceId = serviceTokenData.workspace;
-            this.environment = serviceTokenData.environment;
-
-            // decrypt workspace key
-            const workspaceKey = decryptSymmetric({
-                ciphertext: serviceTokenData.encryptedKey,
-                iv: serviceTokenData.iv,
-                tag: serviceTokenData.tag,
                 key: this.key
             });
             
-            // decrypt secrets
-            const secrets = KeyService.decryptSecrets({
-                encryptedSecrets: encryptedSecrets.secrets,
-                workspaceKey
+            this.workspaceId = serviceTokenData.workspace;
+            this.environment = serviceTokenData.environment;
+
+            // set secrets based on default config values
+            Object.keys(config).map((key) => {
+                if (config[key]?.default) {
+                    // case: config has a default value
+                    
+                    validateValueFormat({
+                        key,
+                        value: config[key].default,
+                        format: config[key].format,
+                        isDefault: true
+                    });
+
+                    this.secrets[key] = config[key].default;
+                    if (attachToProcessEnv) {
+                        process.env[key] = String(secrets[key]);
+                    }
+                }
+                
+                if (config[key]?.required) {
+                    // case: config is required
+                    
+                    if (
+                        config[key]?.default !== undefined 
+                        && secrets[key] !== undefined
+                        && process.env[key] !== undefined
+                    ) {
+                        throw new Error(`Expected ${key} but it is undefined / not found`)
+                    }
+                }
             });
             
-            if (attachToProcessEnv) {
-                // case: save secrets and add them to [process.env]
-                Object.keys(secrets).map((key: string) => {
-                    this.secrets[key] = secrets[key];
-                    process.env[key] = secrets[key]
-                });
-            } else {
-                // case: only save secrets
-                Object.keys(secrets).map((key: string) => {
-                    this.secrets[key] = secrets[key];
-                });
-            }
+            // set secrets based on fetched secrets
+            Object.keys(secrets).map((key) => {
+                let v: string | boolean | number | Date = secrets[key];
+                if (key in config) {
+                    // case: pulled key is in config
+                    
+                    if (config[key]?.format) {
+                        // case: config has a format specified
+                        v = castValueToFormat({
+                            value: secrets[key],
+                            format: config[key].format
+                        });
+                    }
+                }
+                
+                this.secrets[key] = v;
+
+                if (attachToProcessEnv) {
+                    process.env[key] = String(secrets[key]);
+                }
+            });
+
         } catch (err) {
             if (this.debug) {
                 console.log('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
@@ -152,7 +172,7 @@ export class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public getSecretValue(key: string): string | undefined {
+    public getSecretValue(key: string): string | number | boolean | Date | undefined {
         let value;
 
         if (this.secrets?.[key]) {

@@ -1,40 +1,62 @@
 import { InfisicalClient } from './client/InfisicalClient';
-export declare const connect: ({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
+export declare const connect: ({ token, siteURL, attachToProcessEnv, debug, config }: {
     token: string;
     siteURL?: string | undefined;
     attachToProcessEnv?: boolean | undefined;
-    defaultValues?: {
-        [key: string]: any;
-    } | undefined;
     debug?: boolean | undefined;
+    config?: {
+        [key: string]: {
+            format: 'string' | 'boolean' | 'number' | 'date';
+            default?: string | boolean | number | Date | undefined;
+            required?: boolean | undefined;
+        };
+    } | undefined;
 }) => Promise<InfisicalClient>;
-export declare const createConnection: ({ token, siteURL, defaultValues, debug }: {
+export declare const createConnection: ({ token, siteURL, defaultValues, debug, config }: {
     token: string;
     siteURL?: string | undefined;
     defaultValues?: {
         [key: string]: any;
     } | undefined;
     debug?: boolean | undefined;
+    config?: {
+        [key: string]: {
+            format: 'string' | 'boolean' | 'number' | 'date';
+            default?: string | boolean | number | Date | undefined;
+            required?: boolean | undefined;
+        };
+    } | undefined;
 }) => Promise<InfisicalClient>;
-export declare const getSecretValue: (key: string) => string | undefined;
+export declare const getSecretValue: (key: string) => string | number | boolean | Date | undefined;
 declare const _default: {
-    connect: ({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
+    connect: ({ token, siteURL, attachToProcessEnv, debug, config }: {
         token: string;
         siteURL?: string | undefined;
         attachToProcessEnv?: boolean | undefined;
-        defaultValues?: {
-            [key: string]: any;
-        } | undefined;
         debug?: boolean | undefined;
+        config?: {
+            [key: string]: {
+                format: "string" | "number" | "boolean" | "date";
+                default?: string | number | boolean | Date | undefined;
+                required?: boolean | undefined;
+            };
+        } | undefined;
     }) => Promise<InfisicalClient>;
-    createConnection: ({ token, siteURL, defaultValues, debug }: {
+    createConnection: ({ token, siteURL, defaultValues, debug, config }: {
         token: string;
         siteURL?: string | undefined;
         defaultValues?: {
             [key: string]: any;
         } | undefined;
         debug?: boolean | undefined;
+        config?: {
+            [key: string]: {
+                format: "string" | "number" | "boolean" | "date";
+                default?: string | number | boolean | Date | undefined;
+                required?: boolean | undefined;
+            };
+        } | undefined;
     }) => Promise<InfisicalClient>;
-    getSecretValue: (key: string) => string | undefined;
+    getSecretValue: (key: string) => string | number | boolean | Date | undefined;
 };
 export default _default;
