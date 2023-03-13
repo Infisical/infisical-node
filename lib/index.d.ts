@@ -1,5 +1,5 @@
 import { InfisicalClient } from './client/InfisicalClient';
-declare const connect: ({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
+export declare const connect: ({ token, siteURL, attachToProcessEnv, defaultValues, debug }: {
     token: string;
     siteURL?: string | undefined;
     attachToProcessEnv?: boolean | undefined;
@@ -8,7 +8,7 @@ declare const connect: ({ token, siteURL, attachToProcessEnv, defaultValues, deb
     } | undefined;
     debug?: boolean | undefined;
 }) => Promise<InfisicalClient>;
-declare const createConnection: ({ token, siteURL, defaultValues, debug }: {
+export declare const createConnection: ({ token, siteURL, defaultValues, debug }: {
     token: string;
     siteURL?: string | undefined;
     defaultValues?: {
@@ -16,5 +16,4 @@ declare const createConnection: ({ token, siteURL, defaultValues, debug }: {
     } | undefined;
     debug?: boolean | undefined;
 }) => Promise<InfisicalClient>;
-declare const getSecretValue: (key: string) => string | undefined;
-export { connect, createConnection, getSecretValue };
+export declare const getSecretValue: (key: string) => string | undefined;

@@ -2,7 +2,7 @@ import { InfisicalClient } from './client/InfisicalClient';
 
 let globalInstance: InfisicalClient;
 
-const connect = async ({
+export const connect = async ({
     token,
     siteURL,
     attachToProcessEnv,
@@ -27,7 +27,7 @@ const connect = async ({
     return instance;
 }
 
-const createConnection = async ({
+export const createConnection = async ({
     token,
     siteURL,
     defaultValues,
@@ -48,16 +48,10 @@ const createConnection = async ({
     return instance;
 }
 
-const getSecretValue = (key: string): string | undefined => {
+export const getSecretValue = (key: string): string | undefined => {
     if (globalInstance) {
         return globalInstance.getSecretValue(key);
     }
 
     return undefined;
-}
-
-export {
-    connect,
-    createConnection,
-    getSecretValue
 }
