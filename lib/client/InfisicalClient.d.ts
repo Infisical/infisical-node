@@ -1,3 +1,4 @@
+import { IConfig } from '../interfaces/client';
 export declare class InfisicalClient {
     private workspaceId;
     private environment;
@@ -22,13 +23,7 @@ export declare class InfisicalClient {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        config?: {
-            [key: string]: {
-                format: 'string' | 'boolean' | 'number' | 'date';
-                default?: string | boolean | number | Date | undefined;
-                required?: boolean;
-            };
-        };
+        config?: IConfig;
         debug?: boolean;
     }): Promise<InfisicalClient>;
     /**
@@ -37,18 +32,12 @@ export declare class InfisicalClient {
      */
     setup({ attachToProcessEnv, config }: {
         attachToProcessEnv?: boolean;
-        config?: {
-            [key: string]: {
-                format: 'string' | 'boolean' | 'number' | 'date';
-                default?: string | boolean | number | Date | undefined;
-                required?: boolean;
-            };
-        };
+        config?: IConfig;
     }): Promise<void>;
     /**
      * Return value for secret with key [key] for an instance of Infisical
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    get(key: string): string | number | boolean | Date | undefined;
+    get<T extends keyof IConfig>(key: T): string | number | boolean | Date | undefined;
 }

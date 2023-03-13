@@ -6,6 +6,7 @@ import {
 import { SecretsObj } from '../types/KeyService';
 import SecretService from '../services/SecretService';
 import { castValueToFormat, validateValueFormat } from '../helpers';
+import { IConfig } from '../interfaces/client';
 
 export class InfisicalClient {
     private workspaceId: string;
@@ -14,13 +15,7 @@ export class InfisicalClient {
     private apiRequest: AxiosInstance;
     private secrets: SecretsObj = {};
     private debug: boolean = false;
-    private config: {
-            [key: string]: {
-                format: 'string' | 'boolean' | 'number' | 'date';
-                default?: string | boolean | number | Date | undefined;
-                required?: boolean;
-            }
-        } = {};
+    private config: IConfig = {};
 
     constructor({ 
         token, 
@@ -62,13 +57,7 @@ export class InfisicalClient {
         token: string;
         siteURL?: string;
         attachToProcessEnv?: boolean;
-        config?: {
-            [key: string]: {
-                format: 'string' | 'boolean' | 'number' | 'date';
-                default?: string | boolean | number | Date | undefined;
-                required?: boolean;
-            }
-        }
+        config?: IConfig;
         debug?: boolean;
     }) {
         const instance = new InfisicalClient({
@@ -94,13 +83,7 @@ export class InfisicalClient {
         config = {}
     }: {
         attachToProcessEnv?: boolean;
-        config?: {
-            [key: string]: {
-                format: 'string' | 'boolean' | 'number' | 'date';
-                default?: string | boolean | number | Date | undefined;
-                required?: boolean;
-            }
-        }
+        config?: IConfig;
     }) {
         try {
             this.config = config;
@@ -180,22 +163,22 @@ export class InfisicalClient {
      * @param {String} key - key of secret
      * @returns {String} value - value of secret
      */
-    public get(key: string): string | number | boolean | Date | undefined {
+    public get<T extends keyof IConfig>(key: T): string | number | boolean | Date | undefined {
         let value;
 
-        if (this.secrets?.[key]) {
+        if (this.secrets[key]) {
             value = this.secrets[key];
         } else {
             value = process.env[key];
         }
 
         if (key in this.config) {
-            const returnType = this.config[key].format;
-            if (returnType === 'number') {
+            const format = this.config[key].format;
+            if (format === 'number') {
                 value = Number(value);
-            } else if (returnType === 'boolean') {
+            } else if (format === 'boolean') {
                 value = Boolean(value);
-            } else if (returnType === 'date') {
+            } else if (format === 'date') {
                 if (typeof value === 'string') {
                     value = new Date(value);
                 }
