@@ -1,12 +1,10 @@
 export declare class InfisicalClient {
-    private workspaceId;
-    private environment;
-    private key;
-    private apiRequest;
     private secrets;
     private debug;
+    private key?;
+    private apiRequest?;
     constructor({ token, siteURL, debug }: {
-        token: string;
+        token?: string | undefined;
         siteURL: string;
         debug: boolean;
     });
@@ -18,7 +16,7 @@ export declare class InfisicalClient {
      * @returns {Promise<Infisical>} - A promise that resolves with a new instance of `Infisical`.
      */
     static connect({ token, siteURL, attachToProcessEnv, debug }: {
-        token: string;
+        token?: string | undefined;
         siteURL?: string;
         attachToProcessEnv?: boolean;
         debug?: boolean;

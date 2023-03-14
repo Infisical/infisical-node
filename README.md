@@ -61,16 +61,6 @@ infisical.connect({
 - `attachToProcessEnv`: Whether or not to attach fetched secrets to `process.env`. Type: `boolean`. Default: `false`.
 - `debug`: Turns debug mode on or off. If debug mode is enabled then the SDK will attempt to print out useful debugging information. Type: `boolean`. Default: `false`.
 
-### Example Initialization with Options
-
-```js
-await infisical.connect({
-  token: "your_infisical_token",
-  siteURL: "your_site_url",
-  attachToProcessEnv: true,
-});
-```
-
 ## Access a Secret Value
 
 ```js
@@ -84,19 +74,22 @@ const express = require("express");
 const port = 3000;
 const infisical = require("infisical-node");
 
-app.get("/", (req, res) => {
-  // access value
-  const name = infisical.getSecret("NAME");
-
-  res.send(`Hello! My name is: ${name}`);
-});
-
-app.listen(port, async () => {
-  // initialize client
+const main = async () => {
   await infisical.connect({
     token: "YOUR_INFISICAL_TOKEN",
   });
 
-  console.log(`App listening on port ${port}`);
-});
+  app.get("/", (req, res) => {
+    // access value
+    const name = infisical.get("NAME");
+    res.send(`Hello! My name is: ${name}`);
+  });
+
+  app.listen(port, async () => {
+    // initialize client
+    console.log(`App listening on port ${port}`);
+  });
+};
+
+main();
 ```

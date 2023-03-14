@@ -7,33 +7,36 @@ import { SecretsObj } from '../types/KeyService';
 import SecretService from '../services/SecretService';
 
 export class InfisicalClient {
-    private workspaceId: string;
-    private environment: string;
-    private key: string;
-    private apiRequest: AxiosInstance;
+    // definite variables
     private secrets: SecretsObj = {};
     private debug: boolean = false;
+
+    // variables related to connecting to Infisical
+    private key?: string;
+    private apiRequest?: AxiosInstance;
 
     constructor({ 
         token, 
         siteURL = INFISICAL_URL,
         debug = false
     }: {
-        token: string;
+        token?: string | undefined;
         siteURL: string;
         debug: boolean;
     }) {
-        const lastDotIdx = token.lastIndexOf('.');
-        const serviceToken = token.substring(0, lastDotIdx);
-        const key = token.substring(lastDotIdx + 1);
+        if (token) {
+            const lastDotIdx = token.lastIndexOf('.');
+            const serviceToken = token.substring(0, lastDotIdx);
+            const key = token.substring(lastDotIdx + 1);
 
-        this.apiRequest = createApiRequestWithAuthInterceptor({
-            baseURL: siteURL,
-            serviceToken
-        });
-        this.key = key;
-        this.workspaceId = '';
-        this.environment = '';
+            this.apiRequest = createApiRequestWithAuthInterceptor({
+                baseURL: siteURL,
+                serviceToken
+            });
+
+            this.key = key;
+        }
+
         this.debug = debug;
     }
     
@@ -50,7 +53,7 @@ export class InfisicalClient {
         attachToProcessEnv = false,
         debug = false
     }: {
-        token: string;
+        token?: string | undefined;
         siteURL?: string;
         attachToProcessEnv?: boolean;
         debug?: boolean;
@@ -78,30 +81,29 @@ export class InfisicalClient {
         attachToProcessEnv?: boolean;
     }) {
         try {
-            
-            // get service token data and secrets
-            const { serviceTokenData, secrets } = await SecretService.getDecryptedDetails({
-                apiRequest: this.apiRequest,
-                key: this.key
-            });
-            
-            this.workspaceId = serviceTokenData.workspace;
-            this.environment = serviceTokenData.environment;
-            
-            // set secrets based on fetched secrets
-            Object.keys(secrets).map((key) => {
-                this.secrets[key] = secrets[key];
 
-                if (attachToProcessEnv) {
-                    process.env[key] = String(secrets[key]);
-                }
-            });
+            if (this.apiRequest && this.key) {
+                // get service token data and secrets
+                const { serviceTokenData, secrets } = await SecretService.getDecryptedDetails({
+                    apiRequest: this.apiRequest,
+                    key: this.key
+                });
+
+                // set secrets based on fetched secrets
+                Object.keys(secrets).map((key) => {
+                    this.secrets[key] = secrets[key];
+
+                    if (attachToProcessEnv) {
+                        process.env[key] = String(secrets[key]);
+                    }
+                });
+            }
 
             console.log('Connected to Infisical');
         } catch (err) {
             if (this.debug) {
                 console.error(err);
-                console.log('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
+                console.error('Failed to set up the Infisical client. Please ensure that your token is valid and try again.');
             }
         }
     }
@@ -114,14 +116,14 @@ export class InfisicalClient {
     public get(key: string): string | undefined {
         let value;
 
-        if (this.secrets[key]) {
+        if (key in this.secrets) {
             value = this.secrets[key];
         } else {
             value = process.env[key];
         }
         
         if (value === undefined && this.debug) {
-           console.log(`Error: Missing value for '${key}'. Please check your configuration.`);
+           console.error(`Error: Missing value for '${key}'. Please check your configuration.`);
         }
         
         return value;
