@@ -128,4 +128,13 @@ export class InfisicalClient {
         
         return value;
     }
+    
+     /**
+     * Returns all the secret keys for an instance of Infisical
+     * @returns {SecretsObj} - object of all secret keys
+     */
+     public getAll(): SecretsObj {
+        const value = this.secrets[key]
+        return value;
+    }
 }
