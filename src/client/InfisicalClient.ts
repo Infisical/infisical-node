@@ -134,7 +134,7 @@ export class InfisicalClient {
      * @returns {SecretsObj} - object of all secret keys
      */
      public getAll(): SecretsObj {
-        const value = this.secrets[key]
+        const value = this.secrets;
         return value;
     }
 }
