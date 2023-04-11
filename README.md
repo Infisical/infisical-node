@@ -67,6 +67,12 @@ infisical.connect({
 const dbURL = infisical.get("DB_URL");
 ```
 
+## Access all Secret Values
+
+```js
+const secrets = infisical.getAll();
+```
+
 ## Example with Express
 
 ```js
@@ -83,6 +89,12 @@ const main = async () => {
     // access value
     const name = infisical.get("NAME");
     res.send(`Hello! My name is: ${name}`);
+  });
+
+  app.get("/secrets", (req, res) => {
+    // access value
+    const secrets = infisical.getAll();
+    res.json({ secrets });
   });
 
   app.listen(port, async () => {
