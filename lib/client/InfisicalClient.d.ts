@@ -1,3 +1,4 @@
+import { SecretsObj } from '../types/KeyService';
 export declare class InfisicalClient {
     private secrets;
     private debug;
@@ -34,4 +35,9 @@ export declare class InfisicalClient {
      * @returns {String} value - value of secret
      */
     get(key: string): string | undefined;
+    /**
+    * Returns all the secret keys for an instance of Infisical
+    * @returns {SecretsObj} - object of all secret keys
+    */
+    getAll(): SecretsObj;
 }
