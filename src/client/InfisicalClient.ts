@@ -30,7 +30,7 @@ class InfisicalClient {
      * Create an instance of the Infisical client
      * @param {Object} obj
      * @param {String} obj.token - an Infisical Token scoped to a project and environment
-     * @param {Boolean} debug - whether or not debug is on
+     * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
     constructor({
@@ -77,8 +77,10 @@ class InfisicalClient {
 
     /**
      * Return secret with name [secretName]
-     * @param {String} key - key of secret
      * @returns {ISecretBundle} secretBundle - secret bundle
+     * @param secretName name of the secret
+     * @param options - secret selection options
+     * @returns - a promise representing the result of the asynchronous get
      */
     public async getSecret(
         secretName: string, 
@@ -93,8 +95,8 @@ class InfisicalClient {
      * Create secret with name [secretName] and value [secretValue]
      * @param secretName - name of secret to create
      * @param secretValue - value of secret to create
-     * @param options
-     * @returns 
+     * @param options - secret selection options
+     * @returns - a promise representing the result of the asynchronous creation
      */
     public async createSecret(
         secretName: string, 
@@ -110,8 +112,8 @@ class InfisicalClient {
      * Update secret with name [secretName] and value [secretValue]
      * @param secretName - name of secret to update
      * @param secretValue - new value for secret
-     * @param options 
-     * @returns 
+     * @param options - secret selection options
+     * @returns - a promise representing the result of the asynchronous update
      */
     public async updateSecret(
         secretName: string,
@@ -126,8 +128,8 @@ class InfisicalClient {
     /**
      * Delete secret with name [secretName]
      * @param secretName - name of secret to delete
-     * @param options 
-     * @returns 
+     * @param options - secret selection options
+     * @returns - a promise representing the result of the asynchronous deletion
      */
     public async deleteSecret(
         secretName: string,
