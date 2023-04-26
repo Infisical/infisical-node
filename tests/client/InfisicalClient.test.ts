@@ -6,8 +6,8 @@ describe('InfisicalClient', () => {
     let client: InfisicalClient;
     beforeAll(async () => {
         client = new InfisicalClient({
-            token: process.env.INFISICAL_TOKEN,
-            siteURL: process.env.SITE_URL,
+            token: process.env.INFISICAL_TOKEN!,
+            siteURL: process.env.SITE_URL!,
             debug: true
         });
         

@@ -1,4 +1,4 @@
-import { InfisicalClient } from '../client/InfisicalClient';
+import InfisicalClient from '../client/InfisicalClient';
 import { 
     GetOptions,
     CreateOptions,

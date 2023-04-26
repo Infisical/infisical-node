@@ -1,4 +1,4 @@
-import { InfisicalClient } from '../client/InfisicalClient';
+import InfisicalClient from '../client/InfisicalClient';
 import { GetOptions, CreateOptions, UpdateOptions, DeleteOptions } from '../types/InfisicalClient';
 import { ISecretBundle } from '../types/models';
 export declare function getSecretHelper(instance: InfisicalClient, secretName: string, options: GetOptions): Promise<ISecretBundle>;

@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import { ISecretBundle } from '../types/models';
 import { ServiceTokenClientConfig, GetOptions, CreateOptions, UpdateOptions, DeleteOptions } from '../types/InfisicalClient';
-export declare class InfisicalClient {
+declare class InfisicalClient {
     cacheConfig: {
         cache: NodeCache;
     };
@@ -54,3 +54,4 @@ export declare class InfisicalClient {
      */
     deleteSecret(secretName: string, options?: DeleteOptions): Promise<ISecretBundle>;
 }
+export default InfisicalClient;

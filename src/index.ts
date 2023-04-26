@@ -1,3 +1,3 @@
-import { InfisicalClient } from './client/InfisicalClient';
+import InfisicalClient from './client/InfisicalClient';
 
 export default InfisicalClient;

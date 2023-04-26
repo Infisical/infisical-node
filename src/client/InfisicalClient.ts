@@ -17,7 +17,7 @@ import {
     deleteSecretHelper
 } from '../helpers/client';
 
-export class InfisicalClient {
+class InfisicalClient {
 
     public cacheConfig: {
         cache: NodeCache;
@@ -138,3 +138,5 @@ export class InfisicalClient {
         return await deleteSecretHelper(this, secretName, options);
     }
 }
+
+export default InfisicalClient;
