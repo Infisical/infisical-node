@@ -3,7 +3,8 @@ import { describe, expect } from '@jest/globals';
 import InfisicalClient from '../../src';
 
 describe('InfisicalClient', () => {
-    let client: InfisicalClient;
+    // let client: InfisicalClient;
+    let client;
     beforeAll(async () => {
         client = new InfisicalClient({
             token: process.env.INFISICAL_TOKEN!,
