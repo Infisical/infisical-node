@@ -5,11 +5,49 @@ export interface ApiRequestInterceptorProps {
     serviceToken: string;
 }
 
-export interface GetSecretsProps {
-    apiRequest: AxiosInstance;
+export interface GetSecretsDTO {
     workspaceId: string;
     environment: string;
 }
 
-export { AxiosInstance };
+export interface GetSecretDTO {
+    secretName: string;
+    workspaceId: string;
+    environment: string;
+    type: 'shared' | 'personal';
+}
 
+export interface CreateSecretDTO {
+    secretName: string;
+    workspaceId: string;
+    environment: string;
+    type: 'shared' | 'personal';
+    secretKeyCiphertext: string;
+    secretKeyIV: string;
+    secretKeyTag: string;
+    secretValueCiphertext: string;
+    secretValueIV: string;
+    secretValueTag: string;
+    secretCommentCiphertext?: string;
+    secretCommentIV?: string;
+    secretCommentTag?: string;
+}
+
+export interface UpdateSecretDTO {
+    secretName: string;
+    workspaceId: string;
+    environment: string;
+    type: 'shared' | 'personal'
+    secretValueCiphertext: string;
+    secretValueIV: string;
+    secretValueTag: string;
+}
+
+export interface DeleteSecretDTO {
+    secretName: string;
+    workspaceId: string;
+    environment: string;
+    type: 'shared' | 'personal'
+}
+
+export { AxiosInstance };

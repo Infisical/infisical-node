@@ -1,57 +1,83 @@
-import { AxiosInstance } from 'axios';
+import {
+    GetFallbackSecretParams,
+    GetDecryptedSecretsParams,
+    GetDecryptedSecretParams,
+    CreateSecretParams,
+    UpdateSecretParams,
+    DeleteSecretParams
+} from '../types/SecretService';
 import { 
-    getServiceTokenData,
-    getSecrets
-} from '../api';
-import { decryptSymmetric } from '../utils/crypto';
-import KeyService from './KeyService';
+    getFallbackSecretHelper,
+    getDecryptedSecretsHelper,
+    getDecryptedSecretHelper,
+    createSecretHelper,
+    updateSecretHelper,
+    deleteSecretHelper
+} from '../helpers/secrets';
+import {
+    populateClientWorkspaceConfigsHelper
+} from '../helpers/key';
+
+import { ServiceTokenClientConfig } from '../types/InfisicalClient';
 
 /**
  * Class for secret-related actions
  */
 export default class SecretService {
+    
+    static async populateClientWorkspaceConfig(clientConfig: ServiceTokenClientConfig) {
+        return await populateClientWorkspaceConfigsHelper(clientConfig);
+    }
+
     /**
-     * Return [serviceTokenData] and [secrets] unlocked by the service token on [apiRequest]
-     * @param {AxiosInstance} apiRequest - an axios instance with service token bound to it.
-     * @param {String} key - key parsed from the Infisical token
+     * Get fallback secret on [process.env]
+     */
+    static async getFallbackSecret(getFallbackSecretParams: GetFallbackSecretParams) {
+        return getFallbackSecretHelper(getFallbackSecretParams);
+    }
+
+    /**
+     * Get (decrypted) secrets from a project and environment
+     * @param {GetDecryptedSecretsParams} getDecryptedSecretsParams 
      * @returns 
      */
-    static async getDecryptedDetails({
-        apiRequest,
-        key
-    }: {
-        apiRequest: AxiosInstance;
-        key: string;
-    }) {
-        // get service token data
-        const serviceTokenData = await getServiceTokenData({
-            apiRequest
-        });
+    static async getDecryptedSecrets(getDecryptedSecretsParams: GetDecryptedSecretsParams) {
+        return await getDecryptedSecretsHelper(getDecryptedSecretsParams);
+    }
+    
+    /**
+     * Get (decrypted) secret
+     * @param {GetDecryptedSecretParams} getDecryptedSecretParams 
+     * @returns 
+     */
+    static async getDecryptedSecret(getDecryptedSecretParams: GetDecryptedSecretParams) {
+        return await getDecryptedSecretHelper(getDecryptedSecretParams);
+    }
 
-        // get secrets
-        const encryptedSecrets = await getSecrets({
-            apiRequest,
-            workspaceId: serviceTokenData.workspace,
-            environment: serviceTokenData.environment
-        });
+    /**
+     * Create secret
+     * @param {CreateSecretParams} createSecretParams 
+     * @returns 
+     */
+    static async createSecret(createSecretParams: CreateSecretParams) {
+        return await createSecretHelper(createSecretParams);
+    }
 
-        // decrypt workspace key
-        const workspaceKey = decryptSymmetric({
-            ciphertext: serviceTokenData.encryptedKey,
-            iv: serviceTokenData.iv,
-            tag: serviceTokenData.tag,
-            key
-        });
-        
-        // decrypt secrets
-        const secrets = KeyService.decryptSecrets({
-            encryptedSecrets: encryptedSecrets.secrets,
-            workspaceKey
-        });
-        
-        return {
-            secrets,
-            serviceTokenData
-        }
+    /**
+     * Update secret
+     * @param {UpdateSecretParams} updateSecretParams 
+     * @returns 
+     */
+    static async updateSecret(updateSecretParams: UpdateSecretParams) {
+        return await updateSecretHelper(updateSecretParams);
+    }
+
+    /**
+     * Delete secret
+     * @param {DeleteSecretParams} deleteSecretParams 
+     * @returns 
+     */
+    static async deleteSecret(deleteSecretParams: DeleteSecretParams) {
+        return await deleteSecretHelper(deleteSecretParams);
     }
 }

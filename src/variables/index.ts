@@ -1,5 +1,7 @@
 const INFISICAL_URL = 'https://app.infisical.com';
+const AUTH_MODE_SERVICE_TOKEN = 'serviceToken';
 
 export {
-    INFISICAL_URL
+    INFISICAL_URL,
+    AUTH_MODE_SERVICE_TOKEN
 }

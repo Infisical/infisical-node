@@ -1,5 +1,3 @@
-import KeyService from "./KeyService";
+import SecretService from './SecretService';
 
-export {
-    KeyService
-}
+export { SecretService };

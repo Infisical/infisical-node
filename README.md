@@ -4,12 +4,12 @@
     </a>
 </h1>
 <p align="center">
-  <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team, devices, and infrastructure.</p>
+  <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team and infrastructure.</p>
 </p>
 
 ## Links
 
-- [SDK docs](https://infisical.com/docs/sdk/overview/usage)
+- [SDK docs](https://infisical.com/docs/sdks/languages/node)
 
 ## Installation
 
@@ -17,91 +17,157 @@
 $ npm install infisical-node
 ```
 
-## Import
+## Configuration
+
+Import the SDK and create a client instance with your Infisical token.
 
 ```js
-// ES6 syntax
-import infisical from "infisical-node";
-```
-
-```js
-// ES5 syntax
-const infisical = require("infisical-node");
-```
-
-## Initialization
-
-If your app only needs to connect to one Infisical project, you should use `infisical.connect`. If you need to connect to multiple Infisical projects, use `infisical.createConnection`.
-
-Both `connect` and `createConnection` take a parameter `token` and pull in the secrets accessible by that Infisical token.
-
-```js
-// using async-await (recommended)
-await infisical.connect({
-  token: "your_infisical_token",
+import InfisicalClient from "infisical-node";
+    
+const client = new InfisicalClient({
+  token: "your_infisical_token"
 });
-```
 
-```js
-// using promise chaining
-infisical.connect({
-    token: "your_infisical_token"
-})
-.then(() => {
-    console.log('Success!)
-})
-.catch(err => {
-    console.error('Error: ', err);
-})
+// your app logic
 ```
 
 ### Options
 
-- `siteURL`: Your self-hosted Infisical site URL. Type: `string`. Default: `https://app.infisical.com`.
-- `attachToProcessEnv`: Whether or not to attach fetched secrets to `process.env`. Type: `boolean`. Default: `false`.
-- `debug`: Turns debug mode on or off. If debug mode is enabled then the SDK will attempt to print out useful debugging information. Type: `boolean`. Default: `false`.
+| Parameter | Type     | Description |
+| --------- | -------- | ----------- |
+| `token`   | `string` | An Infisical Token scoped to a project and environment. |
+| `siteURL` | `string` | Your self-hosted Infisical site URL. Default: `https://app.infisical.com`. |
+| `cacheTTL`| `number` | Time-to-live (in seconds) for refreshing cached secrets. Default: `300`.|
+| `debug`   | `boolean` | Turns debug mode on or off. Default: `false`.      |
 
-## Access a Secret Value
+### Caching
+
+The SDK caches every secret and updates it periodically based on the provided `cacheTTL`. For example, if `cacheTTL` of `300` is provided, then a secret will be refetched 5 minutes after the first fetch; if the fetch fails, the cached secret is returned.
+
+## Working with Secrets
+### Get Secrets
 
 ```js
-const dbURL = infisical.get("DB_URL");
+const secrets = await client.getAllSecrets();
 ```
 
-## Access all Secret Values
+## Get Secret
+
+Retrieve a secret from Infisical:
 
 ```js
-const secrets = infisical.getAll();
+const secret = await client.getSecret("API_KEY");
+const value = secret.secretValue; // get its value
 ```
+
+By default, `getSecret()` returns a personal secret. If not found, it returns a shared secret, or tries to retrieve the value from `process.env`.
+
+To explicitly retrieve a shared secret:
+
+```js
+const secret = await client.getSecret("API_KEY", { type: "shared" });
+const value = secret.secretValue; // get its value
+```
+
+### Parameters
+
+- `secretName` (string): The key of the secret to retrieve.
+- `options` (object, optional): An options object to specify the type of secret.
+  - `type` (string, optional): "personal" (default) or "shared".
+
+## Create Secret
+
+Create a new secret in Infisical:
+
+```js
+const newApiKey = await client.createSecret("API_KEY", "FOO");
+```
+
+### Parameters
+
+- `secretName` (string): The key of the secret to create.
+- `secretValue` (string): The value of the secret.
+- `options` (object, optional): An options object to specify the type of secret.
+  - `type` (string, optional): "shared" (default) or "personal". A personal secret can only be created if a shared secret with the same name exists.
+
+
+## Update Secret
+
+Update an existing secret in Infisical:
+
+```js
+const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
+```
+
+### Parameters
+
+- `secretName` (string): The key of the secret to update.
+- `secretValue` (string): The new value of the secret.
+- `options` (object, optional): An options object to specify the type of secret.
+  - `type` (string, optional): "shared" (default) or "personal".
+
+## Delete Secret
+
+Delete a secret in Infisical:
+
+```js
+const deletedSecret = await client.deleteSecret("API_KEY");
+```
+
+### Parameters
+
+- `secretName` (string): The key of the secret to delete.
+- `options` (object, optional): An options object to specify the type of secret to delete.
+  - `type` (string, optional): "shared" (default) or "personal". Note that deleting a shared secret also deletes all associated personal secrets.
 
 ## Example with Express
 
 ```js
-const express = require("express");
-const port = 3000;
-const infisical = require("infisical-node");
+import InfisicalClient from "infisical-node";
+import express from "express";
+const app = express();
+const PORT = 3000;
 
-const main = async () => {
-  await infisical.connect({
-    token: "YOUR_INFISICAL_TOKEN",
-  });
+const client = new InfisicalClient({
+  token: "YOUR_INFISICAL_TOKEN"
+});
 
-  app.get("/", (req, res) => {
-    // access value
-    const name = infisical.get("NAME");
-    res.send(`Hello! My name is: ${name}`);
-  });
+app.get("/", async (req, res) => {
+  // access value
+  const name = await client.getSecret("NAME");
+  res.send(`Hello! My name is: ${name.secretValue}`);
+});
 
-  app.get("/secrets", (req, res) => {
-    // access value
-    const secrets = infisical.getAll();
-    res.json({ secrets });
-  });
-
-  app.listen(port, async () => {
-    // initialize client
-    console.log(`App listening on port ${port}`);
-  });
-};
-
-main();
+app.listen(PORT, async () => {
+  // initialize client
+  console.log(`App listening on port ${port}`);
+});
 ```
+
+This example demonstrates how to use the Infisical SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
+
+## Contributing
+
+Bug fixes, docs, and library improvements are always welcome. Please refer to our [Contributing Guide](https://infisical.com/docs/contributing/overview) for detailed information on how you can contribute.
+
+### Getting Started
+
+If you want to familiarize yourself with the SDK, you can start by [forking the repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) and [cloning it in your local development environment](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). The project requires [Node.js](https://nodejs.org/en) to be installed on your machine.
+
+After cloning the repository, install the depenencies by running the following command in the directory of your cloned repository:
+
+```bash
+npm install
+```
+
+You can run the existing tests to see if everything is okay by executing:
+
+To run existing tests, you need to make a `.env` at the root of this project containing a `INFISICAL_TOKEN` and `SITE_URL`. This will execute the tests against a project and environment scoped to the `INFISICAL_TOKEN` on a running instance of Infisical at the `SITE_URL` (this could be [Infisical Cloud](https://app.infisical.com)).
+
+```bash
+npm test
+```
+
+## License
+
+`infisical-node` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.

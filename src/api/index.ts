@@ -1,9 +1,5 @@
-import { createApiRequestWithAuthInterceptor } from "./apiRequest";
-import { getSecrets } from "./getSecrets";
-import { getServiceTokenData } from "./getServiceTokenData";
-
+export * from './secrets';
+export * from './serviceTokenData';
 export {
-    createApiRequestWithAuthInterceptor,
-    getSecrets,
-    getServiceTokenData
-}
+    createApiRequestWithAuthInterceptor
+} from './apiRequest';
