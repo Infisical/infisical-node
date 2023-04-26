@@ -98,7 +98,7 @@ const secret = await client.getSecret("API_KEY");
 const value = secret.secretValue; // get its value
 ```
 
-By default, `getSecret()` returns a personal secret. If not found, it returns a shared secret, or tries to retrieve the value from `process.env`.
+By default, `getSecret()` fetches and returns a personal secret. If not found, it returns a shared secret, or tries to retrieve the value from `process.env`. If a secret is fetched, `getSecret()` caches it to reduce excessive calls and re-fetches periodically based on the `cacheTTL` option (default is `300` seconds) when initializing the client — for more information, see the caching section.
 
 To explicitly retrieve a shared secret:
 
