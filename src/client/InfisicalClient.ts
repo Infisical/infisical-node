@@ -2,12 +2,13 @@ import NodeCache from 'node-cache';
 import { INFISICAL_URL, AUTH_MODE_SERVICE_TOKEN } from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
 import { ISecretBundle } from '../types/models';
-import { 
+import {
     ServiceTokenClientConfig,
     GetOptions,
     CreateOptions,
     UpdateOptions,
-    DeleteOptions
+    DeleteOptions,
+    InfisicalClientOptions
 } from '../types/InfisicalClient';
 import {
     getAllSecretsHelper,
@@ -38,12 +39,7 @@ class InfisicalClient {
         siteURL = INFISICAL_URL,
         debug = false,
         cacheTTL = 300
-    }: {
-        token?: string | undefined;
-        siteURL?: string;
-        debug?: boolean;
-        cacheTTL?: number;
-    }) {
+    }: InfisicalClientOptions) {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);

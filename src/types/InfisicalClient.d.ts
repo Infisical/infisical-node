@@ -1,5 +1,12 @@
 import { AxiosInstance } from 'axios';
 
+export interface InfisicalClientOptions {
+    token?: string | undefined;
+    siteURL?: string;
+    debug?: boolean;
+    cacheTTL?: number;
+}
+
 export interface WorkspaceConfig {
     workspaceId: string;
     environment: string;
