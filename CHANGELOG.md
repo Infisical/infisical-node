@@ -2,7 +2,13 @@
 
 All notable changes will be documented in this file.
 
-## [1.1.0] - 2023-04-22
+## [1.1.2] - 2023-04-26
+
+### Minor changes
+
+Patched compatibility with importing the client in `CommonJS`.
+
+## [1.1.0] - 2023-04-26
 
 This version adds support for querying and mutating secrets by name with the introduction of blind-indexing. It also adds support for caching by passing in `cacheTTL`.
 

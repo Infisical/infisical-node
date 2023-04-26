@@ -40,8 +40,8 @@ class InfisicalClient {
         cacheTTL = 300
     }: {
         token?: string | undefined;
-        siteURL: string;
-        debug: boolean;
+        siteURL?: string;
+        debug?: boolean;
         cacheTTL?: number;
     }) {
         if (token && token !== '') {
