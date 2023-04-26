@@ -11,6 +11,32 @@
 
 - [SDK docs](https://infisical.com/docs/sdks/languages/node)
 
+## Basic Usage
+
+```js
+import InfisicalClient from "infisical-node";
+import express from "express";
+const app = express();
+const PORT = 3000;
+
+const client = new InfisicalClient({
+  token: "YOUR_INFISICAL_TOKEN"
+});
+
+app.get("/", async (req, res) => {
+  // access value
+  const name = await client.getSecret("NAME");
+  res.send(`Hello! My name is: ${name.secretValue}`);
+});
+
+app.listen(PORT, async () => {
+  // initialize client
+  console.log(`App listening on port ${port}`);
+});
+```
+
+This example demonstrates how to use the Infisical SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
+
 ## Installation
 
 ```
@@ -51,7 +77,7 @@ The SDK caches every secret and updates it periodically based on the provided `c
 const secrets = await client.getAllSecrets();
 ```
 
-## Get Secret
+### Get Secret
 
 Retrieve a secret from Infisical:
 
@@ -75,7 +101,7 @@ const value = secret.secretValue; // get its value
 - `options` (object, optional): An options object to specify the type of secret.
   - `type` (string, optional): "personal" (default) or "shared".
 
-## Create Secret
+### Create Secret
 
 Create a new secret in Infisical:
 
@@ -91,7 +117,7 @@ const newApiKey = await client.createSecret("API_KEY", "FOO");
   - `type` (string, optional): "shared" (default) or "personal". A personal secret can only be created if a shared secret with the same name exists.
 
 
-## Update Secret
+### Update Secret
 
 Update an existing secret in Infisical:
 
@@ -106,7 +132,7 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 - `options` (object, optional): An options object to specify the type of secret.
   - `type` (string, optional): "shared" (default) or "personal".
 
-## Delete Secret
+### Delete Secret
 
 Delete a secret in Infisical:
 
@@ -120,31 +146,6 @@ const deletedSecret = await client.deleteSecret("API_KEY");
 - `options` (object, optional): An options object to specify the type of secret to delete.
   - `type` (string, optional): "shared" (default) or "personal". Note that deleting a shared secret also deletes all associated personal secrets.
 
-## Example with Express
-
-```js
-import InfisicalClient from "infisical-node";
-import express from "express";
-const app = express();
-const PORT = 3000;
-
-const client = new InfisicalClient({
-  token: "YOUR_INFISICAL_TOKEN"
-});
-
-app.get("/", async (req, res) => {
-  // access value
-  const name = await client.getSecret("NAME");
-  res.send(`Hello! My name is: ${name.secretValue}`);
-});
-
-app.listen(PORT, async () => {
-  // initialize client
-  console.log(`App listening on port ${port}`);
-});
-```
-
-This example demonstrates how to use the Infisical SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
 
 ## Contributing
 
