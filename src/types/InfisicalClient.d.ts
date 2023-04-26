@@ -1,5 +1,12 @@
 import { AxiosInstance } from 'axios';
 
+export interface InfisicalClientOptions {
+    token?: string | undefined;
+    siteURL?: string;
+    debug?: boolean;
+    cacheTTL?: number;
+}
+
 export interface WorkspaceConfig {
     workspaceId: string;
     environment: string;
@@ -32,18 +39,13 @@ export interface ServiceAccountClientConfig extends ClientConfig {
     workspaceConfig?: WorkspaceConfig[];
 }
 
-export interface GetOptions {
-    type: 'shared' | 'personal';
+type SecretType = 'shared' | 'personal'
+
+interface Options {
+    type: SecretType;
 }
 
-export interface CreateOptions {
-    type: 'shared' | 'personal'
-}
-
-export interface UpdateOptions {
-    type: 'shared' | 'personal'
-}
-
-export interface DeleteOptions {
-    type: 'shared' | 'personal'
-}
+export interface GetOptions extends Options {}
+export interface CreateOptions extends Options {}
+export interface UpdateOptions extends Options {}
+export interface DeleteOptions extends Options {}
