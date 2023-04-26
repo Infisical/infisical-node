@@ -16,8 +16,8 @@ declare class InfisicalClient {
      */
     constructor({ token, siteURL, debug, cacheTTL }: {
         token?: string | undefined;
-        siteURL: string;
-        debug: boolean;
+        siteURL?: string;
+        debug?: boolean;
         cacheTTL?: number;
     });
     /**
