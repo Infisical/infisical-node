@@ -14,8 +14,8 @@
 ## Basic Usage
 
 ```js
-import InfisicalClient from "infisical-node";
 import express from "express";
+import InfisicalClient from "infisical-node";
 const app = express();
 const PORT = 3000;
 
@@ -39,8 +39,8 @@ This example demonstrates how to use the Infisical SDK with an Express applicati
 
 ## Installation
 
-```
-npm install infisical-node
+```console
+$ npm install infisical-node
 ```
 
 ## Configuration
