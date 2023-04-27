@@ -1,4 +1,3 @@
-import NodeCache from 'node-cache';
 import { INFISICAL_URL, AUTH_MODE_SERVICE_TOKEN } from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
 import { ISecretBundle } from '../types/models';
@@ -20,9 +19,7 @@ import {
 
 class InfisicalClient {
 
-    public cacheConfig: {
-        cache: NodeCache;
-    }
+    public cache: { [key: string]: ISecretBundle } = {}
 
     public clientConfig: ServiceTokenClientConfig | undefined = undefined;
     public debug: boolean = false;
@@ -55,10 +52,6 @@ class InfisicalClient {
                 }),
                 cacheTTL
             }
-        }
-        
-        this.cacheConfig = {
-            cache: new NodeCache()
         }
 
         this.debug = debug;

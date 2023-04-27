@@ -2,6 +2,12 @@
 
 All notable changes will be documented in this file.
 
+## [1.1.4] - 2023-04-27
+
+### Minor changes
+
+Removed dependecy on `node-cache` in favor of a plain object.
+
 ## [1.1.2] - 2023-04-26
 
 ### Minor changes
@@ -22,7 +28,7 @@ The format of any fetched secrets from the SDK is now a `SecretBundle` that has 
 
 This version also deprecates the `connect()` and `createConnection()` methods in favor of initializing the SDK with `new InfisicalClient(options)`
 
-It also includes some offline tests that can be run by passing in a `INFISICAL_TOKEN` and `SITE_URL` as environment variables to point the test client to an instance of Infisical.
+It also includes some tests that can be run by passing in a `INFISICAL_TOKEN` and `SITE_URL` as environment variables to point the test client to an instance of Infisical.
  
 ## [1.0.38] - 2023-04-14
 

@@ -6,7 +6,7 @@ const createApiRequestWithAuthInterceptor = ({ baseURL, serviceToken }: ApiReque
         baseURL,
         headers: {
             'Content-Type': ' application/json',
-            'User-Agent': `InfisicalNodeSDK/1.0.18`
+            'User-Agent': `InfisicalNodeSDK`
         }
     });
 

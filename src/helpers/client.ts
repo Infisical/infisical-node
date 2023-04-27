@@ -17,8 +17,8 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
-
-        cachedSecret = instance.cacheConfig.cache.get<ISecretBundle>(cacheKey);
+    
+        cachedSecret = instance.cache[cacheKey];
         
         if (cachedSecret) {
             
@@ -44,7 +44,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             type: options.type
         });
         
-        instance.cacheConfig.cache.set<ISecretBundle>(cacheKey, secretBundle);
+        instance.cache[secretName] = secretBundle;
         
         return secretBundle;
     
@@ -82,7 +82,7 @@ export async function getAllSecretsHelper(instance: InfisicalClient): Promise<IS
 
         secretBundles.forEach((secretBundle) => {
             const cacheKey = `${secretBundle.type}-${secretBundle.secretName}`;
-            instance.cacheConfig.cache.set<ISecretBundle>(cacheKey, secretBundle);
+            instance.cache[cacheKey] = secretBundle;
         });
         
         return secretBundles;
@@ -120,7 +120,7 @@ export async function createSecretHelper(
         });
 
         const cacheKey = `${options.type}-${secretName}`;
-        instance.cacheConfig.cache.set<ISecretBundle>(cacheKey, secretBundle);
+        instance.cache[cacheKey] = secretBundle;
         
         return secretBundle;
 
@@ -157,7 +157,7 @@ export async function updateSecretHelper(
         });
 
         const cacheKey = `${options.type}-${secretName}`;
-        instance.cacheConfig.cache.set<ISecretBundle>(cacheKey, secretBundle);
+        instance.cache[cacheKey] = secretBundle;
         
         return secretBundle;
 
@@ -192,7 +192,7 @@ export async function deleteSecretHelper(
         });
 
         const cacheKey = `${options.type}-${secretName}`;
-        instance.cacheConfig.cache.del(cacheKey);
+        delete instance.cache[cacheKey];
         
         return secretBundle;
 

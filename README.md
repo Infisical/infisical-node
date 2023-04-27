@@ -40,7 +40,7 @@ This example demonstrates how to use the Infisical SDK with an Express applicati
 ## Installation
 
 ```
-$ npm install infisical-node
+npm install infisical-node
 ```
 
 ## Configuration
@@ -89,6 +89,8 @@ The SDK caches every secret and updates it periodically based on the provided `c
 const secrets = await client.getAllSecrets();
 ```
 
+Retrieve all secrets within the Infisical project and environment that client is connected to
+
 ### Get Secret
 
 Retrieve a secret from Infisical:
@@ -111,7 +113,7 @@ const value = secret.secretValue; // get its value
 
 - `secretName` (string): The key of the secret to retrieve.
 - `options` (object, optional): An options object to specify the type of secret.
-  - `type` (string, optional): "personal" (default) or "shared".
+  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
 
 ### Create Secret
 
@@ -126,7 +128,7 @@ const newApiKey = await client.createSecret("API_KEY", "FOO");
 - `secretName` (string): The key of the secret to create.
 - `secretValue` (string): The value of the secret.
 - `options` (object, optional): An options object to specify the type of secret.
-  - `type` (string, optional): "shared" (default) or "personal". A personal secret can only be created if a shared secret with the same name exists.
+  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". A personal secret can only be created if a shared secret with the same name exists.
 
 
 ### Update Secret
@@ -142,7 +144,7 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 - `secretName` (string): The key of the secret to update.
 - `secretValue` (string): The new value of the secret.
 - `options` (object, optional): An options object to specify the type of secret.
-  - `type` (string, optional): "shared" (default) or "personal".
+  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared".
 
 ### Delete Secret
 
@@ -156,7 +158,7 @@ const deletedSecret = await client.deleteSecret("API_KEY");
 
 - `secretName` (string): The key of the secret to delete.
 - `options` (object, optional): An options object to specify the type of secret to delete.
-  - `type` (string, optional): "shared" (default) or "personal". Note that deleting a shared secret also deletes all associated personal secrets.
+  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
 
 
 ## Contributing
@@ -169,16 +171,16 @@ If you want to familiarize yourself with the SDK, you can start by [forking the 
 
 After cloning the repository, install the depenencies by running the following command in the directory of your cloned repository:
 
-```bash
-npm install
+```console
+$ npm install
 ```
-
-You can run the existing tests to see if everything is okay by executing:
 
 To run existing tests, you need to make a `.env` at the root of this project containing a `INFISICAL_TOKEN` and `SITE_URL`. This will execute the tests against a project and environment scoped to the `INFISICAL_TOKEN` on a running instance of Infisical at the `SITE_URL` (this could be [Infisical Cloud](https://app.infisical.com)).
 
-```bash
-npm test
+To run all the tests you can use the following command:
+
+```console
+$ npm test
 ```
 
 ## License
