@@ -45,7 +45,7 @@ $ npm install infisical-node
 
 ## Configuration
 
-Import the SDK and create a client instance with your Infisical token.
+Import the SDK and create a client instance with your [Infisical Token](https://infisical.com/docs/getting-started/dashboard/token).
 
 ```js
 const InfisicalClient = require("infisical-node");
@@ -53,8 +53,6 @@ const InfisicalClient = require("infisical-node");
 const client = new InfisicalClient({
   token: "your_infisical_token"
 });
-
-// your app logic
 ```
 
 Using ES6:
