@@ -2,6 +2,16 @@
 
 All notable changes will be documented in this file.
 
+## [1.2.0] - 2023-05-05
+
+This version adds support for generating a symmetric encryption key, symmetric encryption, and decryption; algorithm used is `aes-256-gcm` with 96-bit `iv`.
+
+- `createSymmetricKey()`: Method to create a base64-encoded, 256-bit symmetric key.
+- `encryptSymmetric()`: Method to symmetrically encrypt plaintext using the symmetric key.
+- `decryptSymmetric()`: Method to symmetrically decrypt ciphertext using the symmetric key.
+
+To simplify things for developers, we stick to `base64` encoding and convert to and from bytes inside the methods.
+
 ## [1.1.4] - 2023-04-27
 
 ### Minor changes

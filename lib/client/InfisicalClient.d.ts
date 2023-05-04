@@ -1,5 +1,6 @@
 import { ISecretBundle } from '../types/models';
 import { ServiceTokenClientConfig, GetOptions, CreateOptions, UpdateOptions, DeleteOptions, InfisicalClientOptions } from '../types/InfisicalClient';
+import { IEncryptSymmetricOutput } from '../types/utils';
 declare class InfisicalClient {
     cache: {
         [key: string]: ISecretBundle;
@@ -13,7 +14,7 @@ declare class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor({ token, siteURL, debug, cacheTTL }: InfisicalClientOptions);
+    constructor(options?: InfisicalClientOptions);
     /**
     * Return all the secrets accessible by the instance of Infisical
     */
@@ -49,5 +50,25 @@ declare class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous deletion
      */
     deleteSecret(secretName: string, options?: DeleteOptions): Promise<ISecretBundle>;
+    createSymmetricKey(): string;
+    /**
+     * Encrypt the plaintext [plaintext] with the (base64) 256-bit
+     * secret key [key]
+     * @param plaintext
+     * @param key
+     * @returns {Object} obj
+     * @returns {IEncryptSymmetricOutput} obj
+     */
+    encryptSymmetric(plaintext: string, key: string): IEncryptSymmetricOutput;
+    /**
+     * Decrypt the ciphertext [ciphertext] with the (base64) 256-bit
+     * secret key [key], provided [iv] and [tag]
+     * @param ciphertext
+     * @param key
+     * @param iv
+     * @param tag
+     * @returns
+     */
+    decryptSymmetric(ciphertext: string, key: string, iv: string, tag: string): string;
 }
 export default InfisicalClient;

@@ -7,11 +7,11 @@
   <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team and infrastructure.</p>
 </p>
 
-## Links
+# Links
 
 - [SDK docs](https://infisical.com/docs/sdks/languages/node)
 
-## Basic Usage
+# Basic Usage
 
 ```js
 import express from "express";
@@ -35,15 +35,45 @@ app.listen(PORT, async () => {
 });
 ```
 
-This example demonstrates how to use the Infisical SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
+This example demonstrates how to use the Infisical Node SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
 
-## Installation
+It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm` 
+with components of the encryption/decryption encoded in `base64`.
+
+```js
+import InfisicalClient from "infisical-node";
+const client = new InfisicalClient();
+
+// some plaintext you want to encrypt
+const plaintext = 'The quick brown fox jumps over the lazy dog';
+
+// create a base64-encoded, 256-bit symmetric key
+const key = client.createSymmetricKey();
+
+// encrypt
+const {
+    ciphertext,
+    iv,
+    tag
+} = client.encryptSymmetric(plaintext, key);
+
+// decrypt
+const cleartext = client.decryptSymmetric(
+    ciphertext,
+    key,
+    iv,
+    tag
+);
+```
+
+
+# Installation
 
 ```console
 $ npm install infisical-node
 ```
 
-## Configuration
+# Configuration
 
 Import the SDK and create a client instance with your [Infisical Token](https://infisical.com/docs/getting-started/dashboard/token).
 
@@ -80,8 +110,8 @@ const client = new InfisicalClient({
 
 The SDK caches every secret and updates it periodically based on the provided `cacheTTL`. For example, if `cacheTTL` of `300` is provided, then a secret will be refetched 5 minutes after the first fetch; if the fetch fails, the cached secret is returned.
 
-## Working with Secrets
-### Get Secrets
+# Working with Secrets
+## Get Secrets
 
 ```js
 const secrets = await client.getAllSecrets();
@@ -89,7 +119,7 @@ const secrets = await client.getAllSecrets();
 
 Retrieve all secrets within the Infisical project and environment that client is connected to
 
-### Get Secret
+## Get Secret
 
 Retrieve a secret from Infisical:
 
@@ -113,7 +143,7 @@ const value = secret.secretValue; // get its value
 - `options` (object, optional): An options object to specify the type of secret.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
 
-### Create Secret
+## Create Secret
 
 Create a new secret in Infisical:
 
@@ -129,7 +159,7 @@ const newApiKey = await client.createSecret("API_KEY", "FOO");
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". A personal secret can only be created if a shared secret with the same name exists.
 
 
-### Update Secret
+## Update Secret
 
 Update an existing secret in Infisical:
 
@@ -144,7 +174,7 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 - `options` (object, optional): An options object to specify the type of secret.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared".
 
-### Delete Secret
+## Delete Secret
 
 Delete a secret in Infisical:
 
@@ -158,6 +188,66 @@ const deletedSecret = await client.deleteSecret("API_KEY");
 - `options` (object, optional): An options object to specify the type of secret to delete.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
 
+## Create Symmetric Key
+
+Create a base64-encoded, 256-bit symmetric key to be used for encryption/decryption.
+
+```js
+const key = client.createSymmetricKey()
+```
+
+### Returns
+
+`key` (string): A base64-encoded, 256-bit symmetric key.
+
+## Encrypt Symmetric
+
+Encrypt plaintext -> ciphertext.
+
+```js
+const {
+    ciphertext,
+    iv,
+    tag
+} = client.encryptSymmetric(plaintext, key);
+```
+
+### Parameters
+
+- `plaintext` (string): The plaintext to encrypt.
+- `key` (string): The base64-encoded, 256-bit symmetric key to use to encrypt the `plaintext`.
+
+### Returns
+
+An object containing the following properties:
+
+- `ciphertext` (string): The base64-encoded, encrypted `plaintext`.
+- `iv` (string): The base64-encoded, 96-bit initialization vector generated for the encryption.
+- `tag` (string): The base64-encoded authentication tag generated during the encryption.
+
+## Decrypt Symmetric
+
+Decrypt ciphertext -> plaintext/cleartext.
+
+```js
+const cleartext = client.decryptSymmetric(
+    ciphertext,
+    key,
+    iv,
+    tag
+);
+```
+
+## Parameters
+
+- `ciphertext` (string): The ciphertext to decrypt.
+- `key` (string): The base64-encoded, 256-bit symmetric key to use to decrypt the `ciphertext`.
+- `iv` (string): The base64-encoded, 96-bit initiatlization vector generated for the encryption.
+- `tag` (string): The base64-encoded authentication tag generated during encryption.
+
+### Returns
+
+`cleartext` (string): The decrypted encryption that is the cleartext/plaintext.
 
 ## Contributing
 

@@ -14,7 +14,7 @@ import {
     DeleteSecretParams
 } from '../types/SecretService';
 import { ISecret, ISecretBundle } from '../types/models';
-import { decryptSymmetric, encryptSymmetric } from '../utils/crypto';
+import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from '../utils/crypto';
 
 /**
  * Transform a raw secret returned from the API plus [secretName]
@@ -72,14 +72,14 @@ export const getDecryptedSecretsHelper = async ({
     });
     
     return secrets.map((secret) => {
-        const secretName = decryptSymmetric({
+        const secretName = decryptSymmetric128BitHexKeyUTF8({
             ciphertext: secret.secretKeyCiphertext,
             iv: secret.secretKeyIV,
             tag: secret.secretKeyTag,
             key: workspaceKey
         });
 
-        const secretValue = decryptSymmetric({
+        const secretValue = decryptSymmetric128BitHexKeyUTF8({
             ciphertext: secret.secretValueCiphertext,
             iv: secret.secretValueIV,
             tag: secret.secretValueTag,
@@ -115,7 +115,7 @@ export const getDecryptedSecretHelper = async ({
         type
     });
     
-    const secretValue = decryptSymmetric({
+    const secretValue = decryptSymmetric128BitHexKeyUTF8({
         ciphertext: secret.secretValueCiphertext,
         iv: secret.secretValueIV,
         tag: secret.secretValueTag,
@@ -148,7 +148,7 @@ export const createSecretHelper = async ({
         ciphertext: secretKeyCiphertext,
         iv: secretKeyIV,
         tag: secretKeyTag
-    } = encryptSymmetric({
+    } = encryptSymmetric128BitHexKeyUTF8({
         plaintext: secretName,
         key: workspaceKey
     });
@@ -157,7 +157,7 @@ export const createSecretHelper = async ({
         ciphertext: secretValueCiphertext,
         iv: secretValueIV,
         tag: secretValueTag
-    } = encryptSymmetric({
+    } = encryptSymmetric128BitHexKeyUTF8({
         plaintext: secretValue,
         key: workspaceKey
     });
@@ -201,7 +201,7 @@ export const updateSecretHelper = async ({
         ciphertext: secretValueCiphertext,
         iv: secretValueIV,
         tag: secretValueTag
-    } = encryptSymmetric({
+    } = encryptSymmetric128BitHexKeyUTF8({
         plaintext: secretValue,
         key: workspaceKey
     })
@@ -243,7 +243,7 @@ export const deleteSecretHelper = async ({
         type
     });
     
-    const secretValue = decryptSymmetric({
+    const secretValue = decryptSymmetric128BitHexKeyUTF8({
         ciphertext: secret.secretValueCiphertext,
         iv: secret.secretValueIV,
         tag: secret.secretValueTag,

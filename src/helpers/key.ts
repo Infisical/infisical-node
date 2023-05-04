@@ -1,5 +1,5 @@
 import { getServiceTokenData } from '../api';
-import { decryptSymmetric } from '../utils/crypto';
+import { decryptSymmetric128BitHexKeyUTF8 } from '../utils/crypto';
 import { 
     ServiceTokenClientConfig, 
     ServiceTokenCredentials,
@@ -11,7 +11,7 @@ export const populateClientWorkspaceConfigsHelper = async (clientConfig: Service
         apiRequest: clientConfig.apiRequest
     });
 
-    const workspaceKey = decryptSymmetric({
+    const workspaceKey = decryptSymmetric128BitHexKeyUTF8({
         ciphertext: serviceTokenData.encryptedKey,
         iv: serviceTokenData.iv,
         tag: serviceTokenData.tag,

@@ -10,12 +10,21 @@ import {
     InfisicalClientOptions
 } from '../types/InfisicalClient';
 import {
+    IDecryptSymmetricInput,
+    IEncryptSymmetricOutput
+} from '../types/utils';
+import {
     getAllSecretsHelper,
     getSecretHelper,
     createSecretHelper,
     updateSecretHelper,
     deleteSecretHelper
 } from '../helpers/client';
+import {
+    createSymmetricKey,
+    encryptSymmetric,
+    decryptSymmetric
+} from '../utils/crypto';
 
 class InfisicalClient {
 
@@ -31,12 +40,14 @@ class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor({
-        token, 
-        siteURL = INFISICAL_URL,
-        debug = false,
-        cacheTTL = 300
-    }: InfisicalClientOptions) {
+    constructor(options: InfisicalClientOptions = {
+        token: undefined, 
+        siteURL: INFISICAL_URL,
+        debug: false,
+        cacheTTL: 300
+    }) {
+        const { token, siteURL, debug, cacheTTL } = options;
+
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);
@@ -127,6 +138,43 @@ class InfisicalClient {
         }
     ): Promise<ISecretBundle> {
         return await deleteSecretHelper(this, secretName, options);
+    }
+
+    public createSymmetricKey(): string {
+        return createSymmetricKey();
+    }
+
+    /**
+     * Encrypt the plaintext [plaintext] with the (base64) 256-bit
+     * secret key [key]
+     * @param plaintext 
+     * @param key 
+     * @returns {Object} obj
+     * @returns {IEncryptSymmetricOutput} obj
+     */
+    public encryptSymmetric(plaintext: string, key: string): IEncryptSymmetricOutput {
+        return encryptSymmetric({
+            plaintext,
+            key,
+        });
+    }
+
+    /**
+     * Decrypt the ciphertext [ciphertext] with the (base64) 256-bit
+     * secret key [key], provided [iv] and [tag]
+     * @param ciphertext 
+     * @param key 
+     * @param iv 
+     * @param tag 
+     * @returns 
+     */
+    public decryptSymmetric(ciphertext: string, key: string, iv: string, tag: string): string {
+        return decryptSymmetric({
+            ciphertext,
+            iv,
+            tag,
+            key
+        })
     }
 }
 

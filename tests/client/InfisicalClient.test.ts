@@ -1,10 +1,11 @@
 require('dotenv').config();
 import { describe, expect } from '@jest/globals';
+import crypto from 'crypto';
 import InfisicalClient from '../../src';
 
 describe('InfisicalClient', () => {
     // let client: InfisicalClient;
-    let client;
+    let client: InfisicalClient;
     beforeAll(async () => {
         client = new InfisicalClient({
             token: process.env.INFISICAL_TOKEN!,
@@ -104,5 +105,26 @@ describe('InfisicalClient', () => {
         expect(secret.secretName).toBe('KEY_FOUR');
         expect(secret.secretValue).toBe('KEY_FOUR_VAL');
         expect(secret.type).toBe('shared');
+    });
+    
+    it('encrypt/decrypt symmetric', () => {
+        const plaintext = 'The quick brown fox jumps over the lazy dog';
+        
+        const key = client.createSymmetricKey();
+
+        const {
+            ciphertext,
+            iv,
+            tag
+        } = client.encryptSymmetric(plaintext, key);
+    
+        const cleartext = client.decryptSymmetric(
+            ciphertext,
+            key,
+            iv,
+            tag
+        );
+    
+        expect(plaintext).toBe(cleartext);
     });
 });
