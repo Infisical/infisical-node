@@ -63,10 +63,7 @@ export const decryptAsymmetric = ({ ciphertext, nonce, publicKey, privateKey }: 
 );
 
 /**
- * Return new symmetric key with 
- * @param {Object} options
- * @param {Number} size - size of key to create in bits (128, 256, 512)
- * @param {String} encoding - encoding of key to create (utf8, hex, base64)
+ * Return new base64-encoded, 256-bit symmetric key 
  * @returns {String} key - new symmetric key
  */
 export const createSymmetricKey = (): string => 
@@ -110,7 +107,7 @@ export const encryptSymmetric = ({
  * @param {String} obj.iv - (base64) 256-bit iv
  * @param {String} obj.tag - (base64) tag
  * @param {String} obj.key - (base64) 256-bit key
- * @returns {String} cleartext - the deciphered ciphertext
+ * @returns {String} cleartext - (utf8) the deciphered ciphertext
  */
 export const decryptSymmetric = ({
 	ciphertext,

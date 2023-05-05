@@ -7,8 +7,24 @@
   <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team and infrastructure.</p>
 </p>
 
+# Table of Contents
+
+- [Links](#links)
+- [Basic Usage](#basic-usage)
+- [Secrets](#working-with-secrets)
+  - [Get Secrets](#get-secrets)
+  - [Get Secret](#get-secret)
+  - [Create Secret](#create-secret)
+  - [Update Secret](#update-secret)
+  - [Delete Secret](#delete-secret)
+- [Cryptography](#encryption-decryption)
+  - [Create Symmetric Key](#create-symmetric-key)
+  - [Encrypt Symmetric](#encrypt-symmetric)
+  - [Decrypt Symmetric](#decrypt-symmetric)
+
 # Links
 
+- [Infisical](https://github.com/Infisical/infisical)
 - [SDK docs](https://infisical.com/docs/sdks/languages/node)
 
 # Basic Usage
@@ -110,7 +126,7 @@ const client = new InfisicalClient({
 
 The SDK caches every secret and updates it periodically based on the provided `cacheTTL`. For example, if `cacheTTL` of `300` is provided, then a secret will be refetched 5 minutes after the first fetch; if the fetch fails, the cached secret is returned.
 
-# Working with Secrets
+# Secrets
 ## Get Secrets
 
 ```js
@@ -187,6 +203,8 @@ const deletedSecret = await client.deleteSecret("API_KEY");
 - `secretName` (string): The key of the secret to delete.
 - `options` (object, optional): An options object to specify the type of secret to delete.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
+
+# Cryptography
 
 ## Create Symmetric Key
 

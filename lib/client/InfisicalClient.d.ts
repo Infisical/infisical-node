@@ -50,24 +50,27 @@ declare class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous deletion
      */
     deleteSecret(secretName: string, options?: DeleteOptions): Promise<ISecretBundle>;
+    /**
+     * Create a base64-encoded, 256-bit symmetric key
+     * @returns {String} key - the symmetric key
+     */
     createSymmetricKey(): string;
     /**
      * Encrypt the plaintext [plaintext] with the (base64) 256-bit
      * secret key [key]
      * @param plaintext
-     * @param key
-     * @returns {Object} obj
-     * @returns {IEncryptSymmetricOutput} obj
+     * @param key - base64-encoded, 256-bit symmetric key
+     * @returns {IEncryptSymmetricOutput} - an object containing the base64-encoded ciphertext, iv, and tag
      */
     encryptSymmetric(plaintext: string, key: string): IEncryptSymmetricOutput;
     /**
      * Decrypt the ciphertext [ciphertext] with the (base64) 256-bit
      * secret key [key], provided [iv] and [tag]
-     * @param ciphertext
-     * @param key
-     * @param iv
-     * @param tag
-     * @returns
+     * @param ciphertext - base64-encoded ciphertext
+     * @param key - base64-encoded, 256-bit symmetric key
+     * @param iv - base64-encoded initialization vector
+     * @param tag - base64-encoded authentication tag
+     * @returns {String} - the decrypted [ciphertext] or cleartext
      */
     decryptSymmetric(ciphertext: string, key: string, iv: string, tag: string): string;
 }
