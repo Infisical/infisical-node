@@ -266,7 +266,7 @@ const cleartext = client.decryptSymmetric(
 
 `cleartext` (string): The decrypted encryption that is the cleartext/plaintext.
 
-## Contributing
+# Contributing
 
 Bug fixes, docs, and library improvements are always welcome. Please refer to our [Contributing Guide](https://infisical.com/docs/contributing/overview) for detailed information on how you can contribute.
 
@@ -278,7 +278,7 @@ Bug fixes, docs, and library improvements are always welcome. Please refer to ou
 
 <a href="https://github.com/dangtony98"><img src="https://avatars.githubusercontent.com/u/25857006?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/Aashish-Upadhyay-101"><img src="https://avatars.githubusercontent.com/u/81024263?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/NicoZweifel"><img src="https://avatars.githubusercontent.com/u/34443492?v=4" width="50" height="50" alt=""/></a><a href="https://github.com/gitSambhal"><img src="https://avatars.githubusercontent.com/u/15196655?v=4" width="50" height="50" alt=""/></a>
 
-### Getting Started
+## Getting Started
 
 If you want to familiarize yourself with the SDK, you can start by [forking the repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) and [cloning it in your local development environment](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). The project requires [Node.js](https://nodejs.org/en) to be installed on your machine.
 
@@ -296,6 +296,6 @@ To run all the tests you can use the following command:
 $ npm test
 ```
 
-## License
+# License
 
 `infisical-node` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
