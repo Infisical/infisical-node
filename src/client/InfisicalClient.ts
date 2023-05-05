@@ -40,14 +40,12 @@ class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor(options: InfisicalClientOptions = {
-        token: undefined, 
-        siteURL: INFISICAL_URL,
-        debug: false,
-        cacheTTL: 300
-    }) {
-        const { token, siteURL, debug, cacheTTL } = options;
-
+    constructor({
+        token = undefined, 
+        siteURL = INFISICAL_URL,
+        debug = false,
+        cacheTTL = 300
+    }: InfisicalClientOptions) {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);

@@ -14,7 +14,7 @@ declare class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor(options?: InfisicalClientOptions);
+    constructor({ token, siteURL, debug, cacheTTL }: InfisicalClientOptions);
     /**
     * Return all the secrets accessible by the instance of Infisical
     */
