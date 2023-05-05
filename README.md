@@ -17,7 +17,7 @@
   - [Create Secret](#create-secret)
   - [Update Secret](#update-secret)
   - [Delete Secret](#delete-secret)
-- [Cryptography](#encryption-decryption)
+- [Cryptography](#cryptography)
   - [Create Symmetric Key](#create-symmetric-key)
   - [Encrypt Symmetric](#encrypt-symmetric)
   - [Decrypt Symmetric](#decrypt-symmetric)
@@ -25,7 +25,6 @@
 # Links
 
 - [Infisical](https://github.com/Infisical/infisical)
-- [SDK docs](https://infisical.com/docs/sdks/languages/node)
 
 # Basic Usage
 
