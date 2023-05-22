@@ -70,6 +70,11 @@ class InfisicalClient {
         this.debug = debug;
     }
 
+    /**
+     * Inject Infisical secrets to process.env
+     * @param {Object} obj
+     * @param {String} obj.shouldOverride - whether Infisical secrets should overwrite process.env value if it already exists
+     */
     public async loadSecretsToEnv(options: ProcessEnvConfig): Promise<void> {
         this.processEnvConfig = options;
         this.bundlesLoadedToEnv = {};
