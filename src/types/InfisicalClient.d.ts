@@ -45,7 +45,11 @@ interface Options {
     type: SecretType;
 }
 
-export interface GetOptions extends Options {}
-export interface CreateOptions extends Options {}
-export interface UpdateOptions extends Options {}
-export interface DeleteOptions extends Options {}
+export interface ProcessEnvConfig {
+    shouldOverride: boolean;
+}
+
+export interface GetOptions extends Options { }
+export interface CreateOptions extends Options { }
+export interface UpdateOptions extends Options { }
+export interface DeleteOptions extends Options { }

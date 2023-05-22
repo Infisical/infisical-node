@@ -7,7 +7,8 @@ import {
     CreateOptions,
     UpdateOptions,
     DeleteOptions,
-    InfisicalClientOptions
+    InfisicalClientOptions,
+    ProcessEnvConfig
 } from '../types/InfisicalClient';
 import {
     IDecryptSymmetricInput,
@@ -18,7 +19,8 @@ import {
     getSecretHelper,
     createSecretHelper,
     updateSecretHelper,
-    deleteSecretHelper
+    deleteSecretHelper,
+    loadSecretsToEnvHelper
 } from '../helpers/client';
 import {
     createSymmetricKey,
@@ -32,7 +34,9 @@ class InfisicalClient {
 
     public clientConfig: ServiceTokenClientConfig | undefined = undefined;
     public debug: boolean = false;
-    
+    public processEnvConfig: ProcessEnvConfig | undefined = undefined;
+    public bundlesLoadedToEnv: { [key: string]: ISecretBundle } = {}
+
     /**
      * Create an instance of the Infisical client
      * @param {Object} obj
@@ -41,15 +45,15 @@ class InfisicalClient {
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
     constructor({
-        token = undefined, 
+        token = undefined,
         siteURL = INFISICAL_URL,
         debug = false,
-        cacheTTL = 300
+        cacheTTL = 300,
     }: InfisicalClientOptions) {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);
-            
+
             this.clientConfig = {
                 authMode: AUTH_MODE_SERVICE_TOKEN,
                 credentials: {
@@ -59,19 +63,33 @@ class InfisicalClient {
                     baseURL: siteURL,
                     serviceToken
                 }),
-                cacheTTL
+                cacheTTL,
             }
         }
 
         this.debug = debug;
     }
-    
-     /**
-     * Return all the secrets accessible by the instance of Infisical
+
+    /**
+     * Inject Infisical secrets to process.env
+     * @param {Object} obj
+     * @param {String} obj.shouldOverride - whether Infisical secrets should overwrite process.env value if it already exists
      */
+    public async loadSecretsToEnv(options: ProcessEnvConfig): Promise<void> {
+        this.processEnvConfig = options;
+        this.bundlesLoadedToEnv = {};
+
+        const secretBundles = await this.getAllSecrets();
+
+        return await loadSecretsToEnvHelper(this, secretBundles);
+    }
+
+    /**
+    * Return all the secrets accessible by the instance of Infisical
+    */
     public async getAllSecrets(): Promise<ISecretBundle[]> {
         return await getAllSecretsHelper(this);
-     }
+    }
 
     /**
      * Return secret with name [secretName]
@@ -81,14 +99,14 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous get
      */
     public async getSecret(
-        secretName: string, 
+        secretName: string,
         options: GetOptions = {
             type: 'personal'
         }
     ): Promise<ISecretBundle> {
         return await getSecretHelper(this, secretName, options);
     }
-    
+
     /**
      * Create secret with name [secretName] and value [secretValue]
      * @param secretName - name of secret to create
@@ -97,8 +115,8 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous creation
      */
     public async createSecret(
-        secretName: string, 
-        secretValue: string, 
+        secretName: string,
+        secretValue: string,
         options: CreateOptions = {
             type: 'shared'
         }

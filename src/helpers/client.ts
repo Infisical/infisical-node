@@ -1,5 +1,5 @@
 import InfisicalClient from '../client/InfisicalClient';
-import { 
+import {
     GetOptions,
     CreateOptions,
     UpdateOptions,
@@ -13,28 +13,28 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
     let cachedSecret: ISecretBundle | undefined = undefined;
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
-    
+
         cachedSecret = instance.cache[cacheKey];
-        
+
         if (cachedSecret) {
-            
+
             const currentTime = new Date();
             const cacheExpiryTime = cachedSecret.lastFetchedAt;
             cacheExpiryTime.setSeconds(cacheExpiryTime.getSeconds() + instance.clientConfig.cacheTTL);
-            
+
             if (currentTime < cacheExpiryTime) {
                 if (instance.debug) {
                     console.log(`Returning cached secret: ${cachedSecret.secretName}`)
                 }
-                
+
                 return cachedSecret;
             }
         }
-        
+
         const secretBundle = await SecretService.getDecryptedSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
@@ -43,19 +43,30 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             environment: instance.clientConfig.workspaceConfig?.environment,
             type: options.type
         });
-        
+
+
+        const shouldUpdateProcessEnv = instance.processEnvConfig && (
+            (instance.bundlesLoadedToEnv[secretName].type === 'personal' && secretBundle.type === 'personal') ||
+            (instance.bundlesLoadedToEnv[secretName].type === 'shared')
+        )
+
+        if (shouldUpdateProcessEnv) {
+            process.env[secretName] = secretBundle.secretValue;
+            instance.bundlesLoadedToEnv[secretName] = secretBundle;
+        }
+
         instance.cache[secretName] = secretBundle;
-        
+
         return secretBundle;
-    
+
     } catch (err) {
         if (instance.debug) console.error(err);
-        
+
         if (cachedSecret) {
             if (instance.debug) {
                 console.log(`Returning cached secret: ${cachedSecret}`);
             }
-            
+
             return cachedSecret;
         }
 
@@ -68,7 +79,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
 export async function getAllSecretsHelper(instance: InfisicalClient): Promise<ISecretBundle[]> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -84,7 +95,7 @@ export async function getAllSecretsHelper(instance: InfisicalClient): Promise<IS
             const cacheKey = `${secretBundle.type}-${secretBundle.secretName}`;
             instance.cache[cacheKey] = secretBundle;
         });
-        
+
         return secretBundles;
 
     } catch (err) {
@@ -97,14 +108,14 @@ export async function getAllSecretsHelper(instance: InfisicalClient): Promise<IS
 }
 
 export async function createSecretHelper(
-    instance: InfisicalClient, 
+    instance: InfisicalClient,
     secretName: string,
     secretValue: string,
     options: CreateOptions
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -121,7 +132,24 @@ export async function createSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
-        
+
+        const shouldUpdateProcessEnv = instance.processEnvConfig && (
+            !instance.bundlesLoadedToEnv[secretName] ||
+            options.type === 'personal'
+        )
+
+        if (shouldUpdateProcessEnv) {
+            if (
+                Object.prototype.hasOwnProperty.call(process.env, secretBundle.secretName) &&
+                !instance.processEnvConfig?.shouldOverride
+            ) {
+                instance.debug && console.log(`"${secretBundle.secretName}" is already defined in \`process.env\` and was NOT overwritten`);
+            } else {
+                process.env[secretName] = secretBundle.secretValue;
+                instance.bundlesLoadedToEnv[secretName] = secretBundle;
+            }
+        }
+
         return secretBundle;
 
     } catch (err) {
@@ -141,7 +169,7 @@ export async function updateSecretHelper(
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -158,7 +186,17 @@ export async function updateSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
-        
+
+        const shouldUpdateProcessEnv = instance.processEnvConfig && (
+            (instance.bundlesLoadedToEnv[secretName].type === 'personal' && secretBundle.type === 'personal') ||
+            (instance.bundlesLoadedToEnv[secretName].type === 'shared')
+        )
+
+        if (shouldUpdateProcessEnv) {
+            process.env[secretName] = secretBundle.secretValue;
+            instance.bundlesLoadedToEnv[secretName] = secretBundle;
+        }
+
         return secretBundle;
 
     } catch (err) {
@@ -177,7 +215,7 @@ export async function deleteSecretHelper(
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -193,7 +231,15 @@ export async function deleteSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         delete instance.cache[cacheKey];
-        
+
+        if (
+            instance.processEnvConfig &&
+            instance.bundlesLoadedToEnv[secretName].type === secretBundle.type
+        ) {
+            delete process.env[secretName];
+            delete instance.bundlesLoadedToEnv[secretName];
+        }
+
         return secretBundle;
 
     } catch (err) {
@@ -203,4 +249,29 @@ export async function deleteSecretHelper(
             secretName
         })
     }
+}
+
+export async function loadSecretsToEnvHelper(instance: InfisicalClient, secretBundles: ISecretBundle[]) {
+    const { processEnvConfig } = instance;
+    let loadedBundles: ISecretBundle[] = [];
+
+    const addBundle = (bundleToAdd: ISecretBundle) => {
+
+        const loadedBundle = instance.bundlesLoadedToEnv[bundleToAdd.secretName];
+        if (
+            Object.prototype.hasOwnProperty.call(process.env, bundleToAdd.secretName) &&
+            !processEnvConfig?.shouldOverride &&
+            !loadedBundle
+        ) {
+            console.log(`"${bundleToAdd.secretName}" is already defined in \`process.env\` and was NOT overwritten`);
+            return;
+        }
+
+        if (!loadedBundle) {
+            instance.bundlesLoadedToEnv[bundleToAdd.secretName] = bundleToAdd;
+            process.env[bundleToAdd.secretName] = bundleToAdd.secretValue;
+        }
+    }
+
+    return secretBundles.forEach(addBundle);
 }
