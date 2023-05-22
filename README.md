@@ -52,6 +52,38 @@ app.listen(PORT, async () => {
 
 This example demonstrates how to use the Infisical Node SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
 
+Another approach would be to inject the Infisical secrets to the `process.env` object as demonstrated below
+
+```js
+import express from "express";
+import InfisicalClient from "infisical-node";
+
+const app = express();
+const PORT = 3000;
+
+const client = new InfisicalClient({
+  token: "YOUR_INFISICAL_TOKEN",
+});
+
+const setupServer = async () => {
+  await client.loadSecretsToEnv({
+    shouldOverride: true,
+  });
+
+  app.get("/", async (req, res) => {
+    // access value
+    res.send(`Hello! My name is: ${process.env.USERNAME}`);
+  });
+
+  app.listen(PORT, async () => {
+    // initialize client
+    console.log(`App listening on port ${PORT}`);
+  });
+};
+
+setupServer();
+```
+
 It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm` 
 with components of the encryption/decryption encoded in `base64`.
 
