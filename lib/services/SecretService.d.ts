@@ -8,35 +8,35 @@ export default class SecretService {
     /**
      * Get fallback secret on [process.env]
      */
-    static getFallbackSecret(getFallbackSecretParams: GetFallbackSecretParams): Promise<import("../types/models").ISecretBundle>;
+    static getFallbackSecret(getFallbackSecretParams: GetFallbackSecretParams): Promise<import("../types").ISecretBundle>;
     /**
      * Get (decrypted) secrets from a project and environment
      * @param {GetDecryptedSecretsParams} getDecryptedSecretsParams
      * @returns
      */
-    static getDecryptedSecrets(getDecryptedSecretsParams: GetDecryptedSecretsParams): Promise<import("../types/models").ISecretBundle[]>;
+    static getDecryptedSecrets(getDecryptedSecretsParams: GetDecryptedSecretsParams): Promise<import("../types").ISecretBundle[]>;
     /**
      * Get (decrypted) secret
      * @param {GetDecryptedSecretParams} getDecryptedSecretParams
      * @returns
      */
-    static getDecryptedSecret(getDecryptedSecretParams: GetDecryptedSecretParams): Promise<import("../types/models").ISecretBundle>;
+    static getDecryptedSecret(getDecryptedSecretParams: GetDecryptedSecretParams): Promise<import("../types").ISecretBundle>;
     /**
      * Create secret
      * @param {CreateSecretParams} createSecretParams
      * @returns
      */
-    static createSecret(createSecretParams: CreateSecretParams): Promise<import("../types/models").ISecretBundle>;
+    static createSecret(createSecretParams: CreateSecretParams): Promise<import("../types").ISecretBundle>;
     /**
      * Update secret
      * @param {UpdateSecretParams} updateSecretParams
      * @returns
      */
-    static updateSecret(updateSecretParams: UpdateSecretParams): Promise<import("../types/models").ISecretBundle>;
+    static updateSecret(updateSecretParams: UpdateSecretParams): Promise<import("../types").ISecretBundle>;
     /**
      * Delete secret
      * @param {DeleteSecretParams} deleteSecretParams
      * @returns
      */
-    static deleteSecret(deleteSecretParams: DeleteSecretParams): Promise<import("../types/models").ISecretBundle>;
+    static deleteSecret(deleteSecretParams: DeleteSecretParams): Promise<import("../types").ISecretBundle>;
 }
