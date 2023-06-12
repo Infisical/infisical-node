@@ -44,7 +44,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             type: options.type
         });
         
-        instance.cache[secretName] = secretBundle;
+        instance.cache[`${secretBundle.type}-${secretBundle.secretName}`] = secretBundle;
         
         return secretBundle;
     
