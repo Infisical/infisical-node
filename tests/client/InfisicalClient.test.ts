@@ -12,7 +12,7 @@ describe('InfisicalClient', () => {
             siteURL: process.env.SITE_URL!,
             debug: true
         });
-        
+
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL');
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL_PERSONAL', {
             type: 'personal'
@@ -27,26 +27,24 @@ describe('InfisicalClient', () => {
     });
 
     it('get overriden personal secret', async () => {
-        const secret = await client.getSecret('KEY_ONE');
-        
+        const secret = await client.getSecret('KEY_ONE', { path: "/", envSlug: "dev" });
+
         expect(secret.secretName).toBe('KEY_ONE');
         expect(secret.secretValue).toBe('KEY_ONE_VAL_PERSONAL');
         expect(secret.type).toBe('personal');
     });
-    
+
     it('get shared secret specified', async () => {
-        const secret = await client.getSecret('KEY_ONE', {
-            type: 'shared'
-        });
-        
+        const secret = await client.getSecret('KEY_ONE', { path: "/", envSlug: "dev" }, { type: 'shared' });
+
         expect(secret.secretName).toBe('KEY_ONE');
         expect(secret.secretValue).toBe('KEY_ONE_VAL');
         expect(secret.type).toBe('shared');
     });
-    
+
     it('get shared secret', async () => {
-        const secret = await client.getSecret('KEY_TWO');
-        
+        const secret = await client.getSecret('KEY_TWO', { path: "/", envSlug: "dev" });
+
         expect(secret.secretName).toBe('KEY_TWO');
         expect(secret.secretValue).toBe('KEY_TWO_VAL');
         expect(secret.type).toBe('shared');
@@ -54,26 +52,26 @@ describe('InfisicalClient', () => {
 
     it('create shared secret', async () => {
         const secret = await client.createSecret('KEY_THREE', 'KEY_THREE_VAL');
-        
+
         expect(secret.secretName).toBe('KEY_THREE');
         expect(secret.secretValue).toBe('KEY_THREE_VAL');
         expect(secret.type).toBe('shared');
     });
-    
+
     it('create personal secret', async () => {
         const secret = await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL');
         const secretPersonal = await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL_PERSONAL', {
             type: 'personal'
         });
-        
+
         expect(secretPersonal.secretName).toBe('KEY_FOUR');
         expect(secretPersonal.secretValue).toBe('KEY_FOUR_VAL_PERSONAL');
         expect(secretPersonal.type).toBe('personal');
     });
-    
+
     it('update shared secret', async () => {
         const secret = await client.updateSecret('KEY_THREE', 'FOO');
-        
+
         expect(secret.secretName).toBe('KEY_THREE');
         expect(secret.secretValue).toBe('FOO');
         expect(secret.type).toBe('shared');
@@ -83,12 +81,12 @@ describe('InfisicalClient', () => {
         const secret = await client.updateSecret('KEY_FOUR', 'BAR', {
             type: 'personal'
         });
-        
+
         expect(secret.secretName).toBe('KEY_FOUR');
         expect(secret.secretValue).toBe('BAR');
         expect(secret.type).toBe('personal');
     });
-    
+
     it('delete personal secret', async () => {
         const secret = await client.deleteSecret('KEY_FOUR', {
             type: 'personal'
@@ -106,10 +104,10 @@ describe('InfisicalClient', () => {
         expect(secret.secretValue).toBe('KEY_FOUR_VAL');
         expect(secret.type).toBe('shared');
     });
-    
+
     it('encrypt/decrypt symmetric', () => {
         const plaintext = 'The quick brown fox jumps over the lazy dog';
-        
+
         const key = client.createSymmetricKey();
 
         const {
@@ -117,14 +115,22 @@ describe('InfisicalClient', () => {
             iv,
             tag
         } = client.encryptSymmetric(plaintext, key);
-    
+
         const cleartext = client.decryptSymmetric(
             ciphertext,
             key,
             iv,
             tag
         );
-    
+
         expect(plaintext).toBe(cleartext);
     });
+
+    it("get all secrets", async () => {
+        const secrets = await client.getAllSecrets({ path: "/", envSlug: "dev" })
+        console.log("secrets", secrets)
+
+        const secret = await client.getSecret("SOME_KEY", { path: "/", envSlug: "dev" })
+        console.log("secrets", secrets)
+    })
 });
