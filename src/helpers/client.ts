@@ -1,61 +1,62 @@
 import InfisicalClient from '../client/InfisicalClient';
-import { 
+import {
     GetOptions,
     CreateOptions,
     UpdateOptions,
     DeleteOptions
 } from '../types/InfisicalClient';
 import { SecretService } from '../services';
-import { ISecretBundle } from '../types/models';
+import { ISecretBundle, Scope } from '../types/models';
 
-export async function getSecretHelper(instance: InfisicalClient, secretName: string, options: GetOptions): Promise<ISecretBundle> {
+export async function getSecretHelper(instance: InfisicalClient, secretName: string, scope: Scope, options: GetOptions): Promise<ISecretBundle> {
     const cacheKey = `${options.type}-${secretName}`;
     let cachedSecret: ISecretBundle | undefined = undefined;
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
-    
+
         cachedSecret = instance.cache[cacheKey];
-        
+
         if (cachedSecret) {
-            
+
             const currentTime = new Date();
             const cacheExpiryTime = cachedSecret.lastFetchedAt;
             cacheExpiryTime.setSeconds(cacheExpiryTime.getSeconds() + instance.clientConfig.cacheTTL);
-            
+
             if (currentTime < cacheExpiryTime) {
                 if (instance.debug) {
                     console.log(`Returning cached secret: ${cachedSecret.secretName}`)
                 }
-                
+
                 return cachedSecret;
             }
         }
-        
+
         const secretBundle = await SecretService.getDecryptedSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             secretName,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: instance.clientConfig.workspaceConfig?.environment,
+            environment: scope.envSlug,
+            path: scope.path,
             type: options.type
         });
-        
+
         instance.cache[secretName] = secretBundle;
-        
+
         return secretBundle;
-    
+
     } catch (err) {
         if (instance.debug) console.error(err);
-        
+
         if (cachedSecret) {
             if (instance.debug) {
                 console.log(`Returning cached secret: ${cachedSecret}`);
             }
-            
+
             return cachedSecret;
         }
 
@@ -65,10 +66,10 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
     }
 }
 
-export async function getAllSecretsHelper(instance: InfisicalClient): Promise<ISecretBundle[]> {
+export async function getAllSecretsHelper(instance: InfisicalClient, scope: Scope): Promise<ISecretBundle[]> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -77,14 +78,15 @@ export async function getAllSecretsHelper(instance: InfisicalClient): Promise<IS
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: instance.clientConfig.workspaceConfig?.environment
+            environment: scope.envSlug,
+            path: scope.path
         });
 
         secretBundles.forEach((secretBundle) => {
             const cacheKey = `${secretBundle.type}-${secretBundle.secretName}`;
             instance.cache[cacheKey] = secretBundle;
         });
-        
+
         return secretBundles;
 
     } catch (err) {
@@ -97,14 +99,14 @@ export async function getAllSecretsHelper(instance: InfisicalClient): Promise<IS
 }
 
 export async function createSecretHelper(
-    instance: InfisicalClient, 
+    instance: InfisicalClient,
     secretName: string,
     secretValue: string,
     options: CreateOptions
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -121,7 +123,7 @@ export async function createSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
-        
+
         return secretBundle;
 
     } catch (err) {
@@ -141,7 +143,7 @@ export async function updateSecretHelper(
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -158,7 +160,7 @@ export async function updateSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
-        
+
         return secretBundle;
 
     } catch (err) {
@@ -177,7 +179,7 @@ export async function deleteSecretHelper(
 ): Promise<ISecretBundle> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
-        
+
         if (!instance.clientConfig.workspaceConfig) {
             instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
         }
@@ -193,7 +195,7 @@ export async function deleteSecretHelper(
 
         const cacheKey = `${options.type}-${secretName}`;
         delete instance.cache[cacheKey];
-        
+
         return secretBundle;
 
     } catch (err) {

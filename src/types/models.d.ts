@@ -46,3 +46,8 @@ export interface IServiceTokenData {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface Scope {
+    envSlug: string;
+    path: string
+}

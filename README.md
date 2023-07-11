@@ -40,7 +40,7 @@ const client = new InfisicalClient({
 
 app.get("/", async (req, res) => {
   // access value
-  const name = await client.getSecret("NAME");
+  const name = await client.getSecret("NAME", { path: "/", envSlug: "dev" });
   res.send(`Hello! My name is: ${name.secretValue}`);
 });
 
@@ -129,17 +129,22 @@ The SDK caches every secret and updates it periodically based on the provided `c
 ## Get Secrets
 
 ```js
-const secrets = await client.getAllSecrets();
+const secrets = await client.getAllSecrets({ path: "/folder-1/folder-2/", envSlug: "dev" });
 ```
 
-Retrieve all secrets within the Infisical project and environment that client is connected to
+Retrieve all secrets within a given environment and folder path. The service token used must have access to the given path and environment.
+
+### Parameters 
+- `scope` (object, required)
+  - `envSlug` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+  - `path` The folder path from where secrets should be fetched from 
 
 ## Get Secret
 
 Retrieve a secret from Infisical:
 
 ```js
-const secret = await client.getSecret("API_KEY");
+const secret = await client.getSecret("API_KEY", { path: "/", envSlug: "dev" });
 const value = secret.secretValue; // get its value
 ```
 
@@ -148,13 +153,16 @@ By default, `getSecret()` fetches and returns a personal secret. If not found, i
 To explicitly retrieve a shared secret:
 
 ```js
-const secret = await client.getSecret("API_KEY", { type: "shared" });
+const secret = await client.getSecret("API_KEY", { path: "/", envSlug: "dev" }, { type: "shared" });
 const value = secret.secretValue; // get its value
 ```
 
 ### Parameters
 
 - `secretName` (string): The key of the secret to retrieve.
+- `scope` (object, required)
+  - `envSlug` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+  - `path` The folder path from where secrets should be fetched from 
 - `options` (object, optional): An options object to specify the type of secret.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
 

@@ -1,6 +1,6 @@
 import { INFISICAL_URL, AUTH_MODE_SERVICE_TOKEN } from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
-import { ISecretBundle } from '../types/models';
+import { ISecretBundle, Scope } from '../types/models';
 import {
     ServiceTokenClientConfig,
     GetOptions,
@@ -32,7 +32,7 @@ class InfisicalClient {
 
     public clientConfig: ServiceTokenClientConfig | undefined = undefined;
     public debug: boolean = false;
-    
+
     /**
      * Create an instance of the Infisical client
      * @param {Object} obj
@@ -41,7 +41,7 @@ class InfisicalClient {
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
     constructor({
-        token = undefined, 
+        token = undefined,
         siteURL = INFISICAL_URL,
         debug = false,
         cacheTTL = 300
@@ -49,7 +49,7 @@ class InfisicalClient {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);
-            
+
             this.clientConfig = {
                 authMode: AUTH_MODE_SERVICE_TOKEN,
                 credentials: {
@@ -65,13 +65,13 @@ class InfisicalClient {
 
         this.debug = debug;
     }
-    
-     /**
-     * Return all the secrets accessible by the instance of Infisical
-     */
-    public async getAllSecrets(): Promise<ISecretBundle[]> {
-        return await getAllSecretsHelper(this);
-     }
+
+    /**
+    * Return all the secrets accessible by the instance of Infisical
+    */
+    public async getAllSecrets(scope: Scope): Promise<ISecretBundle[]> {
+        return await getAllSecretsHelper(this, scope);
+    }
 
     /**
      * Return secret with name [secretName]
@@ -81,14 +81,15 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous get
      */
     public async getSecret(
-        secretName: string, 
+        secretName: string,
+        scope: Scope,
         options: GetOptions = {
             type: 'personal'
         }
     ): Promise<ISecretBundle> {
-        return await getSecretHelper(this, secretName, options);
+        return await getSecretHelper(this, secretName, scope, options);
     }
-    
+
     /**
      * Create secret with name [secretName] and value [secretValue]
      * @param secretName - name of secret to create
@@ -97,8 +98,8 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous creation
      */
     public async createSecret(
-        secretName: string, 
-        secretValue: string, 
+        secretName: string,
+        secretValue: string,
         options: CreateOptions = {
             type: 'shared'
         }

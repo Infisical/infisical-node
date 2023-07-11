@@ -8,12 +8,14 @@ export interface ApiRequestInterceptorProps {
 export interface GetSecretsDTO {
     workspaceId: string;
     environment: string;
+    path: string;
 }
 
 export interface GetSecretDTO {
     secretName: string;
     workspaceId: string;
     environment: string;
+    path: string;
     type: 'shared' | 'personal';
 }
 

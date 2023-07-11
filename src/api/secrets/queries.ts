@@ -13,7 +13,8 @@ export const getSecrets = async (apiRequest: AxiosInstance, options: GetSecretsD
         '/api/v3/secrets', {
         params: {
             workspaceId: options.workspaceId,
-            environment: options.environment
+            environment: options.environment,
+            secretPath: options.path
         }
     });
 
@@ -26,7 +27,8 @@ export const getSecret = async (apiRequest: AxiosInstance, options: GetSecretDTO
         params: {
             workspaceId: options.workspaceId,
             environment: options.environment,
-            type: options.type
+            type: options.type,
+            secretPath: options.path
         }
     });
 
@@ -36,16 +38,16 @@ export const getSecret = async (apiRequest: AxiosInstance, options: GetSecretDTO
 export const createSecret = async (apiRequest: AxiosInstance, options: CreateSecretDTO) => {
     const { data: { secret } } = await apiRequest.post<{ secret: ISecret }>(
         `/api/v3/secrets/${options.secretName}`, {
-            workspaceId: options.workspaceId,
-            environment: options.environment,
-            type: options.type,
-            secretKeyCiphertext: options.secretKeyCiphertext,
-            secretKeyIV: options.secretKeyIV,
-            secretKeyTag: options.secretKeyTag,
-            secretValueCiphertext: options.secretValueCiphertext,
-            secretValueIV: options.secretValueIV,
-            secretValueTag: options.secretValueTag
-        }
+        workspaceId: options.workspaceId,
+        environment: options.environment,
+        type: options.type,
+        secretKeyCiphertext: options.secretKeyCiphertext,
+        secretKeyIV: options.secretKeyIV,
+        secretKeyTag: options.secretKeyTag,
+        secretValueCiphertext: options.secretValueCiphertext,
+        secretValueIV: options.secretValueIV,
+        secretValueTag: options.secretValueTag
+    }
     );
 
     return secret;
@@ -54,13 +56,13 @@ export const createSecret = async (apiRequest: AxiosInstance, options: CreateSec
 export const updateSecret = async (apiRequest: AxiosInstance, options: UpdateSecretDTO) => {
     const { data: { secret } } = await apiRequest.patch<{ secret: ISecret }>(
         `/api/v3/secrets/${options.secretName}`, {
-            workspaceId: options.workspaceId,
-            environment: options.environment,
-            type: options.type,
-            secretValueCiphertext: options.secretValueCiphertext,
-            secretValueIV: options.secretValueIV,
-            secretValueTag: options.secretValueTag
-        }
+        workspaceId: options.workspaceId,
+        environment: options.environment,
+        type: options.type,
+        secretValueCiphertext: options.secretValueCiphertext,
+        secretValueIV: options.secretValueIV,
+        secretValueTag: options.secretValueTag
+    }
     );
 
     return secret;
@@ -69,12 +71,12 @@ export const updateSecret = async (apiRequest: AxiosInstance, options: UpdateSec
 export const deleteSecret = async (apiRequest: AxiosInstance, options: DeleteSecretDTO) => {
     const { data: { secret } } = await apiRequest.delete<{ secret: ISecret }>(
         `/api/v3/secrets/${options.secretName}`, {
-            data: {
-                workspaceId: options.workspaceId,
-                environment: options.environment,
-                type: options.type
-            }
+        data: {
+            workspaceId: options.workspaceId,
+            environment: options.environment,
+            type: options.type
         }
+    }
     );
 
     return secret;
