@@ -242,13 +242,15 @@ export const deleteSecretHelper = async ({
     workspaceId,
     environment,
     type,
+    path,
     workspaceKey
 }: DeleteSecretParams) => {
     const secret = await deleteSecret(apiRequest, {
         secretName,
         workspaceId,
         environment,
-        type
+        type,
+        path
     });
 
     const secretValue = decryptSymmetric128BitHexKeyUTF8({

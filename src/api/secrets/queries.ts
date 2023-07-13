@@ -74,7 +74,8 @@ export const deleteSecret = async (apiRequest: AxiosInstance, options: DeleteSec
             data: {
                 workspaceId: options.workspaceId,
                 environment: options.environment,
-                type: options.type
+                type: options.type,
+                secretPath: options.path
             }
         }
     );

@@ -51,7 +51,8 @@ export interface DeleteSecretDTO {
     secretName: string;
     workspaceId: string;
     environment: string;
-    type: 'shared' | 'personal'
+    path: string;
+    type: 'shared' | 'personal';
 }
 
 export { AxiosInstance };

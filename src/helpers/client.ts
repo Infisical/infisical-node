@@ -193,6 +193,7 @@ export async function deleteSecretHelper(
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
             environment: options.environment,
             type: options.type,
+            path: options.path,
             secretName
         });
 

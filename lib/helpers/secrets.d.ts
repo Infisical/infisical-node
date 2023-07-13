@@ -33,4 +33,4 @@ export declare const updateSecretHelper: ({ apiRequest, workspaceKey, workspaceI
  * @param {DeleteSecretParams} deleteSecretParams
  * @returns
  */
-export declare const deleteSecretHelper: ({ apiRequest, secretName, workspaceId, environment, type, workspaceKey }: DeleteSecretParams) => Promise<ISecretBundle>;
+export declare const deleteSecretHelper: ({ apiRequest, secretName, workspaceId, environment, type, path, workspaceKey }: DeleteSecretParams) => Promise<ISecretBundle>;

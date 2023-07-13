@@ -134,7 +134,7 @@ Retrieve all secrets within a given environment and folder path. The service tok
 
 ### Parameters
 
-- `options` (object, optional)
+- `options` (object)
   - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
   - `path` The path from where secrets should be fetched from
 
@@ -145,8 +145,8 @@ Retrieve a secret from Infisical:
 ```js
 const secret = await client.getSecret("API_KEY", {
   environment: "dev",
-  type: "shared",
   path: "/",
+  type: "shared"
 });
 const value = secret.secretValue; // get its value
 ```
@@ -158,8 +158,8 @@ To explicitly retrieve a shared secret:
 ```js
 const secret = await client.getSecret("API_KEY", {
   environment: "dev",
-  type: "shared",
   path: "/",
+  type: "shared"
 });
 const value = secret.secretValue; // get its value
 ```
@@ -177,7 +177,11 @@ const value = secret.secretValue; // get its value
 Create a new secret in Infisical:
 
 ```js
-const newApiKey = await client.createSecret("API_KEY", "FOO");
+const newApiKey = await client.createSecret("API_KEY", "FOO", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
@@ -194,7 +198,11 @@ const newApiKey = await client.createSecret("API_KEY", "FOO");
 Update an existing secret in Infisical:
 
 ```js
-const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
+const updatedApiKey = await client.updateSecret("API_KEY", "BAR", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
@@ -211,7 +219,11 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 Delete a secret in Infisical:
 
 ```js
-const deletedSecret = await client.deleteSecret("API_KEY");
+const deletedSecret = await client.deleteSecret("API_KEY", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
