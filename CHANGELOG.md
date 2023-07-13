@@ -2,6 +2,10 @@
 
 All notable changes will be documented in this file.
 
+## [1.3.1] - 2023-07-13
+
+This version patched a small bug in the implementation of path-based `deleteSecret` as well as incorrect caching in `getSecret`.
+
 ## [1.3.0] - 2023-07-13
 
 This version adds support for folders or path-based secret storage for all secret CRUD operations.
