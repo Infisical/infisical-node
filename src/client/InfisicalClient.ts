@@ -1,8 +1,9 @@
 import { INFISICAL_URL, AUTH_MODE_SERVICE_TOKEN } from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
-import { ISecretBundle } from '../types/models';
+import { ISecretBundle, Scope } from '../types/models';
 import {
     ServiceTokenClientConfig,
+    GetAllOptions,
     GetOptions,
     CreateOptions,
     UpdateOptions,
@@ -32,7 +33,7 @@ class InfisicalClient {
 
     public clientConfig: ServiceTokenClientConfig | undefined = undefined;
     public debug: boolean = false;
-    
+
     /**
      * Create an instance of the Infisical client
      * @param {Object} obj
@@ -41,7 +42,7 @@ class InfisicalClient {
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
     constructor({
-        token = undefined, 
+        token = undefined,
         siteURL = INFISICAL_URL,
         debug = false,
         cacheTTL = 300
@@ -49,7 +50,7 @@ class InfisicalClient {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
             const serviceToken = token.substring(0, lastDotIdx);
-            
+
             this.clientConfig = {
                 authMode: AUTH_MODE_SERVICE_TOKEN,
                 credentials: {
@@ -65,13 +66,18 @@ class InfisicalClient {
 
         this.debug = debug;
     }
-    
-     /**
-     * Return all the secrets accessible by the instance of Infisical
-     */
-    public async getAllSecrets(): Promise<ISecretBundle[]> {
-        return await getAllSecretsHelper(this);
-     }
+
+    /**
+    * Return all the secrets accessible by the instance of Infisical
+    */
+    public async getAllSecrets(
+        options: GetAllOptions = {
+            environment: "dev",
+            path: "/"
+        }
+    ): Promise<ISecretBundle[]> {
+        return await getAllSecretsHelper(this, options);
+    }
 
     /**
      * Return secret with name [secretName]
@@ -81,14 +87,16 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous get
      */
     public async getSecret(
-        secretName: string, 
+        secretName: string,
         options: GetOptions = {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await getSecretHelper(this, secretName, options);
     }
-    
+
     /**
      * Create secret with name [secretName] and value [secretValue]
      * @param secretName - name of secret to create
@@ -97,10 +105,12 @@ class InfisicalClient {
      * @returns - a promise representing the result of the asynchronous creation
      */
     public async createSecret(
-        secretName: string, 
-        secretValue: string, 
+        secretName: string,
+        secretValue: string,
         options: CreateOptions = {
-            type: 'shared'
+            environment: "dev",
+            type: "shared",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await createSecretHelper(this, secretName, secretValue, options);
@@ -117,7 +127,9 @@ class InfisicalClient {
         secretName: string,
         secretValue: string,
         options: UpdateOptions = {
-            type: 'shared'
+            type: "shared",
+            environment: "dev",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await updateSecretHelper(this, secretName, secretValue, options);
@@ -132,7 +144,9 @@ class InfisicalClient {
     public async deleteSecret(
         secretName: string,
         options: DeleteOptions = {
-            type: 'shared'
+            environment: "dev",
+            type: "shared",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await deleteSecretHelper(this, secretName, options);
