@@ -1,10 +1,8 @@
 require('dotenv').config();
 import { describe, expect } from '@jest/globals';
-import crypto from 'crypto';
 import InfisicalClient from '../../src';
 
 describe('InfisicalClient', () => {
-    // let client: InfisicalClient;
     let client: InfisicalClient;
     beforeAll(async () => {
         client = new InfisicalClient({
@@ -15,7 +13,9 @@ describe('InfisicalClient', () => {
 
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL');
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL_PERSONAL', {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
     });
@@ -27,7 +27,11 @@ describe('InfisicalClient', () => {
     });
 
     it('get overriden personal secret', async () => {
-        const secret = await client.getSecret('KEY_ONE', { path: "/", envSlug: "dev" });
+        const secret = await client.getSecret('KEY_ONE', { 
+            type: "personal",
+            environment: "dev",
+            path: "/"
+        });
 
         expect(secret.secretName).toBe('KEY_ONE');
         expect(secret.secretValue).toBe('KEY_ONE_VAL_PERSONAL');
@@ -35,7 +39,11 @@ describe('InfisicalClient', () => {
     });
 
     it('get shared secret specified', async () => {
-        const secret = await client.getSecret('KEY_ONE', { path: "/", envSlug: "dev" }, { type: 'shared' });
+        const secret = await client.getSecret('KEY_ONE', { 
+            type: 'shared',
+            environment: "dev",
+            path: "/"
+        });
 
         expect(secret.secretName).toBe('KEY_ONE');
         expect(secret.secretValue).toBe('KEY_ONE_VAL');
@@ -43,7 +51,7 @@ describe('InfisicalClient', () => {
     });
 
     it('get shared secret', async () => {
-        const secret = await client.getSecret('KEY_TWO', { path: "/", envSlug: "dev" });
+        const secret = await client.getSecret('KEY_TWO');
 
         expect(secret.secretName).toBe('KEY_TWO');
         expect(secret.secretValue).toBe('KEY_TWO_VAL');
@@ -59,9 +67,11 @@ describe('InfisicalClient', () => {
     });
 
     it('create personal secret', async () => {
-        const secret = await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL');
+        await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL');
         const secretPersonal = await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL_PERSONAL', {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         });
 
         expect(secretPersonal.secretName).toBe('KEY_FOUR');
@@ -79,7 +89,9 @@ describe('InfisicalClient', () => {
 
     it('update personal secret', async () => {
         const secret = await client.updateSecret('KEY_FOUR', 'BAR', {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         });
 
         expect(secret.secretName).toBe('KEY_FOUR');
@@ -89,7 +101,9 @@ describe('InfisicalClient', () => {
 
     it('delete personal secret', async () => {
         const secret = await client.deleteSecret('KEY_FOUR', {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         });
 
         expect(secret.secretName).toBe('KEY_FOUR');
@@ -125,12 +139,4 @@ describe('InfisicalClient', () => {
 
         expect(plaintext).toBe(cleartext);
     });
-
-    it("get all secrets", async () => {
-        const secrets = await client.getAllSecrets({ path: "/", envSlug: "dev" })
-        console.log("secrets", secrets)
-
-        const secret = await client.getSecret("SOME_KEY", { path: "/", envSlug: "dev" })
-        console.log("secrets", secrets)
-    })
 });

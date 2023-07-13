@@ -2,7 +2,6 @@ import { getServiceTokenData } from '../api';
 import { decryptSymmetric128BitHexKeyUTF8 } from '../utils/crypto';
 import { 
     ServiceTokenClientConfig, 
-    ServiceTokenCredentials,
     WorkspaceConfig
 } from '../types/InfisicalClient';
 
@@ -20,7 +19,6 @@ export const populateClientWorkspaceConfigsHelper = async (clientConfig: Service
     
     return ({
         workspaceId: serviceTokenData.workspace,
-        environment: serviceTokenData.environment,
         workspaceKey
     });
 }

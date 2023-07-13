@@ -1,5 +1,6 @@
 import InfisicalClient from '../client/InfisicalClient';
 import {
+    GetAllOptions,
     GetOptions,
     CreateOptions,
     UpdateOptions,
@@ -8,7 +9,7 @@ import {
 import { SecretService } from '../services';
 import { ISecretBundle, Scope } from '../types/models';
 
-export async function getSecretHelper(instance: InfisicalClient, secretName: string, scope: Scope, options: GetOptions): Promise<ISecretBundle> {
+export async function getSecretHelper(instance: InfisicalClient, secretName: string, options: GetOptions): Promise<ISecretBundle> {
     const cacheKey = `${options.type}-${secretName}`;
     let cachedSecret: ISecretBundle | undefined = undefined;
     try {
@@ -40,8 +41,8 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             secretName,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: scope.envSlug,
-            path: scope.path,
+            environment: options.environment,
+            path: options.path,
             type: options.type
         });
 
@@ -66,7 +67,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
     }
 }
 
-export async function getAllSecretsHelper(instance: InfisicalClient, scope: Scope): Promise<ISecretBundle[]> {
+export async function getAllSecretsHelper(instance: InfisicalClient, options: GetAllOptions): Promise<ISecretBundle[]> {
     try {
         if (!instance.clientConfig) throw Error('Failed to find client config');
 
@@ -78,8 +79,8 @@ export async function getAllSecretsHelper(instance: InfisicalClient, scope: Scop
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: scope.envSlug,
-            path: scope.path
+            environment: options.environment,
+            path: options.path
         });
 
         secretBundles.forEach((secretBundle) => {
@@ -115,7 +116,8 @@ export async function createSecretHelper(
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: instance.clientConfig.workspaceConfig?.environment,
+            environment: options.environment,
+            path: options.path,
             type: options.type,
             secretName,
             secretValue
@@ -152,8 +154,9 @@ export async function updateSecretHelper(
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: instance.clientConfig.workspaceConfig?.environment,
+            environment: options.environment,
             type: options.type,
+            path: options.path,
             secretName,
             secretValue
         });
@@ -188,7 +191,7 @@ export async function deleteSecretHelper(
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
-            environment: instance.clientConfig.workspaceConfig?.environment,
+            environment: options.environment,
             type: options.type,
             secretName
         });

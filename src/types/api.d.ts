@@ -23,6 +23,7 @@ export interface CreateSecretDTO {
     secretName: string;
     workspaceId: string;
     environment: string;
+    path: string;
     type: 'shared' | 'personal';
     secretKeyCiphertext: string;
     secretKeyIV: string;
@@ -40,6 +41,7 @@ export interface UpdateSecretDTO {
     workspaceId: string;
     environment: string;
     type: 'shared' | 'personal'
+    path: string;
     secretValueCiphertext: string;
     secretValueIV: string;
     secretValueTag: string;

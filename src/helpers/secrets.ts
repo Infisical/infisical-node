@@ -145,7 +145,8 @@ export const createSecretHelper = async ({
     environment,
     type,
     secretName,
-    secretValue
+    secretValue,
+    path
 }: CreateSecretParams) => {
 
     const {
@@ -176,7 +177,8 @@ export const createSecretHelper = async ({
         secretKeyTag,
         secretValueCiphertext,
         secretValueIV,
-        secretValueTag
+        secretValueTag,
+        path
     });
 
     return transformSecretToSecretBundle({
@@ -197,6 +199,7 @@ export const updateSecretHelper = async ({
     workspaceId,
     environment,
     type,
+    path,
     secretName,
     secretValue
 }: UpdateSecretParams) => {
@@ -215,6 +218,7 @@ export const updateSecretHelper = async ({
         workspaceId,
         environment,
         type,
+        path,
         secretValueCiphertext,
         secretValueIV,
         secretValueTag

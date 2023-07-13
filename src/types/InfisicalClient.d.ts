@@ -9,7 +9,6 @@ export interface InfisicalClientOptions {
 
 export interface WorkspaceConfig {
     workspaceId: string;
-    environment: string;
     workspaceKey: string;
 }
 
@@ -43,6 +42,13 @@ type SecretType = 'shared' | 'personal'
 
 interface Options {
     type: SecretType;
+    environment: string;
+    path: string;
+}
+
+export interface GetAllOptions {
+    environment: string;
+    path: string;
 }
 
 export interface GetOptions extends Options {}

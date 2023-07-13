@@ -3,6 +3,7 @@ import { createApiRequestWithAuthInterceptor } from '../api';
 import { ISecretBundle, Scope } from '../types/models';
 import {
     ServiceTokenClientConfig,
+    GetAllOptions,
     GetOptions,
     CreateOptions,
     UpdateOptions,
@@ -69,8 +70,13 @@ class InfisicalClient {
     /**
     * Return all the secrets accessible by the instance of Infisical
     */
-    public async getAllSecrets(scope: Scope): Promise<ISecretBundle[]> {
-        return await getAllSecretsHelper(this, scope);
+    public async getAllSecrets(
+        options: GetAllOptions = {
+            environment: "dev",
+            path: "/"
+        }
+    ): Promise<ISecretBundle[]> {
+        return await getAllSecretsHelper(this, options);
     }
 
     /**
@@ -82,12 +88,13 @@ class InfisicalClient {
      */
     public async getSecret(
         secretName: string,
-        scope: Scope,
         options: GetOptions = {
-            type: 'personal'
+            type: "personal",
+            environment: "dev",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
-        return await getSecretHelper(this, secretName, scope, options);
+        return await getSecretHelper(this, secretName, options);
     }
 
     /**
@@ -101,7 +108,9 @@ class InfisicalClient {
         secretName: string,
         secretValue: string,
         options: CreateOptions = {
-            type: 'shared'
+            environment: "dev",
+            type: "shared",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await createSecretHelper(this, secretName, secretValue, options);
@@ -118,7 +127,9 @@ class InfisicalClient {
         secretName: string,
         secretValue: string,
         options: UpdateOptions = {
-            type: 'shared'
+            type: "shared",
+            environment: "dev",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await updateSecretHelper(this, secretName, secretValue, options);
@@ -133,7 +144,9 @@ class InfisicalClient {
     public async deleteSecret(
         secretName: string,
         options: DeleteOptions = {
-            type: 'shared'
+            environment: "dev",
+            type: "shared",
+            path: "/"
         }
     ): Promise<ISecretBundle> {
         return await deleteSecretHelper(this, secretName, options);

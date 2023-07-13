@@ -1,5 +1,5 @@
 import { ISecretBundle } from '../types/models';
-import { ServiceTokenClientConfig, GetOptions, CreateOptions, UpdateOptions, DeleteOptions, InfisicalClientOptions } from '../types/InfisicalClient';
+import { ServiceTokenClientConfig, GetAllOptions, GetOptions, CreateOptions, UpdateOptions, DeleteOptions, InfisicalClientOptions } from '../types/InfisicalClient';
 import { IEncryptSymmetricOutput } from '../types/utils';
 declare class InfisicalClient {
     cache: {
@@ -18,7 +18,7 @@ declare class InfisicalClient {
     /**
     * Return all the secrets accessible by the instance of Infisical
     */
-    getAllSecrets(): Promise<ISecretBundle[]>;
+    getAllSecrets(options?: GetAllOptions): Promise<ISecretBundle[]>;
     /**
      * Return secret with name [secretName]
      * @returns {ISecretBundle} secretBundle - secret bundle
