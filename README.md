@@ -298,7 +298,7 @@ Bug fixes, docs, and library improvements are always welcome. Please refer to ou
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/dangtony98"><img src="https://avatars.githubusercontent.com/u/25857006?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/Aashish-Upadhyay-101"><img src="https://avatars.githubusercontent.com/u/81024263?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/NicoZweifel"><img src="https://avatars.githubusercontent.com/u/34443492?v=4" width="50" height="50" alt=""/></a><a href="https://github.com/gitSambhal"><img src="https://avatars.githubusercontent.com/u/15196655?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/dangtony98"><img src="https://avatars.githubusercontent.com/u/25857006?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/Aashish-Upadhyay-101"><img src="https://avatars.githubusercontent.com/u/81024263?v=4" width="50" height="50" alt=""/></a> <a href="https://github.com/NicoZweifel"><img src="https://avatars.githubusercontent.com/u/34443492?v=4" width="50" height="50" alt=""/></a><a href="https://github.com/gitSambhal"><img src="https://avatars.githubusercontent.com/u/15196655?v=4" width="50" height="50" alt=""/></a><a href="https://github.com/microtronics-jast"><img src="https://avatars.githubusercontent.com/u/132543081?v=4" width="50" height="50" alt=""/></a>
 
 ## Getting Started
 
