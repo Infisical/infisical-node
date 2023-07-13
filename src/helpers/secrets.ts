@@ -46,7 +46,7 @@ const transformSecretToSecretBundle = ({
 /**
  * Get fallback secret on [process.env]
  */
-export const getFallbackSecretHelper = async ({ 
+export const getFallbackSecretHelper = async ({
     secretName
 }: GetFallbackSecretParams): Promise<ISecretBundle> => ({
     secretName,
@@ -64,13 +64,15 @@ export const getDecryptedSecretsHelper = async ({
     apiRequest,
     workspaceId,
     environment,
-    workspaceKey
+    workspaceKey,
+    path
 }: GetDecryptedSecretsParams) => {
     const secrets = await getSecrets(apiRequest, {
         workspaceId,
-        environment
+        environment,
+        path
     });
-    
+
     return secrets.map((secret) => {
         const secretName = decryptSymmetric128BitHexKeyUTF8({
             ciphertext: secret.secretKeyCiphertext,
@@ -85,7 +87,7 @@ export const getDecryptedSecretsHelper = async ({
             tag: secret.secretValueTag,
             key: workspaceKey
         });
-        
+
         return transformSecretToSecretBundle({
             secret,
             secretName,
@@ -105,23 +107,25 @@ export const getDecryptedSecretHelper = async ({
     workspaceId,
     environment,
     workspaceKey,
-    type
+    type,
+    path
 }: GetDecryptedSecretParams): Promise<ISecretBundle> => {
-    
+
     const secret = await getSecret(apiRequest, {
         secretName,
         workspaceId,
         environment,
-        type
+        type,
+        path
     });
-    
+
     const secretValue = decryptSymmetric128BitHexKeyUTF8({
         ciphertext: secret.secretValueCiphertext,
         iv: secret.secretValueIV,
         tag: secret.secretValueTag,
         key: workspaceKey
     });
-    
+
     return transformSecretToSecretBundle({
         secret,
         secretName,
@@ -141,7 +145,8 @@ export const createSecretHelper = async ({
     environment,
     type,
     secretName,
-    secretValue
+    secretValue,
+    path
 }: CreateSecretParams) => {
 
     const {
@@ -172,9 +177,10 @@ export const createSecretHelper = async ({
         secretKeyTag,
         secretValueCiphertext,
         secretValueIV,
-        secretValueTag
+        secretValueTag,
+        path
     });
-    
+
     return transformSecretToSecretBundle({
         secret,
         secretName,
@@ -193,10 +199,11 @@ export const updateSecretHelper = async ({
     workspaceId,
     environment,
     type,
+    path,
     secretName,
     secretValue
 }: UpdateSecretParams) => {
-    
+
     const {
         ciphertext: secretValueCiphertext,
         iv: secretValueIV,
@@ -211,11 +218,12 @@ export const updateSecretHelper = async ({
         workspaceId,
         environment,
         type,
+        path,
         secretValueCiphertext,
         secretValueIV,
         secretValueTag
     });
-    
+
     return transformSecretToSecretBundle({
         secret,
         secretName,
@@ -234,21 +242,23 @@ export const deleteSecretHelper = async ({
     workspaceId,
     environment,
     type,
+    path,
     workspaceKey
 }: DeleteSecretParams) => {
     const secret = await deleteSecret(apiRequest, {
         secretName,
         workspaceId,
         environment,
-        type
+        type,
+        path
     });
-    
+
     const secretValue = decryptSymmetric128BitHexKeyUTF8({
         ciphertext: secret.secretValueCiphertext,
         iv: secret.secretValueIV,
         tag: secret.secretValueTag,
         key: workspaceKey
-    }); 
+    });
 
     return transformSecretToSecretBundle({
         secret,

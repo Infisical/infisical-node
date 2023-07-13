@@ -35,12 +35,16 @@ const app = express();
 const PORT = 3000;
 
 const client = new InfisicalClient({
-  token: "YOUR_INFISICAL_TOKEN"
+  token: "YOUR_INFISICAL_TOKEN",
 });
 
 app.get("/", async (req, res) => {
   // access value
-  const name = await client.getSecret("NAME");
+  const name = await client.getSecret("NAME", {
+    environment: "dev",
+    path: "/",
+    type: "shared",
+  });
   res.send(`Hello! My name is: ${name.secretValue}`);
 });
 
@@ -52,7 +56,7 @@ app.listen(PORT, async () => {
 
 This example demonstrates how to use the Infisical Node SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
 
-It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm` 
+It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm`
 with components of the encryption/decryption encoded in `base64`.
 
 ```js
@@ -60,27 +64,17 @@ import InfisicalClient from "infisical-node";
 const client = new InfisicalClient();
 
 // some plaintext you want to encrypt
-const plaintext = 'The quick brown fox jumps over the lazy dog';
+const plaintext = "The quick brown fox jumps over the lazy dog";
 
 // create a base64-encoded, 256-bit symmetric key
 const key = client.createSymmetricKey();
 
 // encrypt
-const {
-    ciphertext,
-    iv,
-    tag
-} = client.encryptSymmetric(plaintext, key);
+const { ciphertext, iv, tag } = client.encryptSymmetric(plaintext, key);
 
 // decrypt
-const cleartext = client.decryptSymmetric(
-    ciphertext,
-    key,
-    iv,
-    tag
-);
+const cleartext = client.decryptSymmetric(ciphertext, key, iv, tag);
 ```
-
 
 # Installation
 
@@ -94,9 +88,9 @@ Import the SDK and create a client instance with your [Infisical Token](https://
 
 ```js
 const InfisicalClient = require("infisical-node");
-    
+
 const client = new InfisicalClient({
-  token: "your_infisical_token"
+  token: "your_infisical_token",
 });
 ```
 
@@ -104,9 +98,9 @@ Using ES6:
 
 ```js
 import InfisicalClient from "infisical-node";
-    
+
 const client = new InfisicalClient({
-  token: "your_infisical_token"
+  token: "your_infisical_token",
 });
 
 // your app logic
@@ -114,32 +108,46 @@ const client = new InfisicalClient({
 
 ### Options
 
-| Parameter | Type     | Description |
-| --------- | -------- | ----------- |
-| `token`   | `string` | An Infisical Token scoped to a project and environment. |
-| `siteURL` | `string` | Your self-hosted Infisical site URL. Default: `https://app.infisical.com`. |
-| `cacheTTL`| `number` | Time-to-live (in seconds) for refreshing cached secrets. Default: `300`.|
-| `debug`   | `boolean` | Turns debug mode on or off. Default: `false`.      |
+| Parameter  | Type      | Description                                                                |
+| ---------- | --------- | -------------------------------------------------------------------------- |
+| `token`    | `string`  | An Infisical Token scoped to a project and environment.                    |
+| `siteURL`  | `string`  | Your self-hosted Infisical site URL. Default: `https://app.infisical.com`. |
+| `cacheTTL` | `number`  | Time-to-live (in seconds) for refreshing cached secrets. Default: `300`.   |
+| `debug`    | `boolean` | Turns debug mode on or off. Default: `false`.                              |
 
 ### Caching
 
 The SDK caches every secret and updates it periodically based on the provided `cacheTTL`. For example, if `cacheTTL` of `300` is provided, then a secret will be refetched 5 minutes after the first fetch; if the fetch fails, the cached secret is returned.
 
 # Secrets
+
 ## Get Secrets
 
 ```js
-const secrets = await client.getAllSecrets();
+const secrets = await client.getAllSecrets({
+  environment: "dev",
+  path: "/foo/bar/",
+});
 ```
 
-Retrieve all secrets within the Infisical project and environment that client is connected to
+Retrieve all secrets within a given environment and folder path. The service token used must have access to the given path and environment.
+
+### Parameters
+
+- `options` (object)
+  - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+  - `path` The path from where secrets should be fetched from
 
 ## Get Secret
 
 Retrieve a secret from Infisical:
 
 ```js
-const secret = await client.getSecret("API_KEY");
+const secret = await client.getSecret("API_KEY", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 const value = secret.secretValue; // get its value
 ```
 
@@ -148,14 +156,20 @@ By default, `getSecret()` fetches and returns a personal secret. If not found, i
 To explicitly retrieve a shared secret:
 
 ```js
-const secret = await client.getSecret("API_KEY", { type: "shared" });
+const secret = await client.getSecret("API_KEY", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 const value = secret.secretValue; // get its value
 ```
 
 ### Parameters
 
 - `secretName` (string): The key of the secret to retrieve.
-- `options` (object, optional): An options object to specify the type of secret.
+- `options` (object, optional): An options object to speify the type of secret.
+  - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+  - `path` The path from where secrets should be fetched from
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
 
 ## Create Secret
@@ -163,7 +177,11 @@ const value = secret.secretValue; // get its value
 Create a new secret in Infisical:
 
 ```js
-const newApiKey = await client.createSecret("API_KEY", "FOO");
+const newApiKey = await client.createSecret("API_KEY", "FOO", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
@@ -171,15 +189,20 @@ const newApiKey = await client.createSecret("API_KEY", "FOO");
 - `secretName` (string): The key of the secret to create.
 - `secretValue` (string): The value of the secret.
 - `options` (object, optional): An options object to specify the type of secret.
+  - `environment` The slug name (dev, prod, etc) of the environment where secret should be created
+  - `path` The path from where secret should be created.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". A personal secret can only be created if a shared secret with the same name exists.
-
 
 ## Update Secret
 
 Update an existing secret in Infisical:
 
 ```js
-const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
+const updatedApiKey = await client.updateSecret("API_KEY", "BAR", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
@@ -187,6 +210,8 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 - `secretName` (string): The key of the secret to update.
 - `secretValue` (string): The new value of the secret.
 - `options` (object, optional): An options object to specify the type of secret.
+  - `environment` The slug name (dev, prod, etc) of the environment where secret should be updated.
+  - `path` The path from where secret should be updated.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared".
 
 ## Delete Secret
@@ -194,13 +219,19 @@ const updatedApiKey = await client.updateSecret("API_KEY", "BAR");
 Delete a secret in Infisical:
 
 ```js
-const deletedSecret = await client.deleteSecret("API_KEY");
+const deletedSecret = await client.deleteSecret("API_KEY", {
+  environment: "dev",
+  path: "/",
+  type: "shared"
+});
 ```
 
 ### Parameters
 
 - `secretName` (string): The key of the secret to delete.
 - `options` (object, optional): An options object to specify the type of secret to delete.
+  - `environment` The slug name (dev, prod, etc) of the environment where secret should be deleted.
+  - `path` The path from where secret should be deleted.
   - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
 
 # Cryptography
@@ -210,7 +241,7 @@ const deletedSecret = await client.deleteSecret("API_KEY");
 Create a base64-encoded, 256-bit symmetric key to be used for encryption/decryption.
 
 ```js
-const key = client.createSymmetricKey()
+const key = client.createSymmetricKey();
 ```
 
 ### Returns
@@ -222,11 +253,7 @@ const key = client.createSymmetricKey()
 Encrypt plaintext -> ciphertext.
 
 ```js
-const {
-    ciphertext,
-    iv,
-    tag
-} = client.encryptSymmetric(plaintext, key);
+const { ciphertext, iv, tag } = client.encryptSymmetric(plaintext, key);
 ```
 
 ### Parameters
@@ -247,12 +274,7 @@ An object containing the following properties:
 Decrypt ciphertext -> plaintext/cleartext.
 
 ```js
-const cleartext = client.decryptSymmetric(
-    ciphertext,
-    key,
-    iv,
-    tag
-);
+const cleartext = client.decryptSymmetric(ciphertext, key, iv, tag);
 ```
 
 ## Parameters

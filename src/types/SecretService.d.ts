@@ -26,6 +26,7 @@ export interface CreateSecretParams {
     workspaceId: string;
     environment: string;
     type: 'shared' | 'personal';
+    path: string;
     secretName: string;
     secretValue: string;
 }
@@ -36,6 +37,7 @@ export interface UpdateSecretParams {
     workspaceId: string;
     environment: string;
     type: 'shared' | 'personal';
+    path: string;
     secretName: string;
     secretValue: string;
 }
