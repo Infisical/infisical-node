@@ -86,6 +86,10 @@ export async function getAllSecretsHelper(instance: InfisicalClient, options: Ge
         secretBundles.forEach((secretBundle) => {
             const cacheKey = `${secretBundle.type}-${secretBundle.secretName}`;
             instance.cache[cacheKey] = secretBundle;
+            
+            if (options.attachToProcessEnv) {
+                process.env[secretBundle.secretName] = secretBundle.secretValue;
+            }
         });
 
         return secretBundles;

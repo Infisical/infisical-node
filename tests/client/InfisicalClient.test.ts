@@ -10,7 +10,6 @@ describe('InfisicalClient', () => {
             siteURL: process.env.SITE_URL!,
             debug: true
         });
-
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL');
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL_PERSONAL', {
             type: "personal",
@@ -18,13 +17,13 @@ describe('InfisicalClient', () => {
             path: "/"
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
-    });
+    }, 10000);
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
-    });
+    }, 10000);
 
     it('get overriden personal secret', async () => {
         const secret = await client.getSecret('KEY_ONE', { 
@@ -117,6 +116,20 @@ describe('InfisicalClient', () => {
         expect(secret.secretName).toBe('KEY_FOUR');
         expect(secret.secretValue).toBe('KEY_FOUR_VAL');
         expect(secret.type).toBe('shared');
+    });
+
+    it('attach all to process.env', async () => {
+        // note: getAllSecrets returns dupliate shared + personal ones at the moment,
+        // should it default to personal?
+        const secretBundles = await client.getAllSecrets({
+            environment: "dev",
+            path: "/",
+            attachToProcessEnv: true
+        });
+        
+        secretBundles.forEach((secretBundle) => {
+            expect(process.env[secretBundle.secretName]).toBe(secretBundle.secretValue);
+        });
     });
 
     it('encrypt/decrypt symmetric', () => {

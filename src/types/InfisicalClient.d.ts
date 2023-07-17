@@ -49,6 +49,7 @@ interface Options {
 export interface GetAllOptions {
     environment: string;
     path: string;
+    attachToProcessEnv: boolean;
 }
 
 export interface GetOptions extends Options {}
