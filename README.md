@@ -137,6 +137,7 @@ Retrieve all secrets within a given environment and folder path. The service tok
 - `options` (object)
   - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
   - `path` The path from where secrets should be fetched from
+  - `attachToProcessEnv` (boolean, optional): Whether or not to attach fetched secrets to `process.env`. If not specified, the default value is `false`.
 
 ## Get Secret
 
