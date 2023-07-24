@@ -9,7 +9,7 @@ export declare const getFallbackSecretHelper: ({ secretName }: GetFallbackSecret
  * @param {GetDecryptedSecretsParams} getDecryptedSecretsParams
  * @returns {Secret} secrets
  */
-export declare const getDecryptedSecretsHelper: ({ apiRequest, workspaceId, environment, workspaceKey, path }: GetDecryptedSecretsParams) => Promise<ISecretBundle[]>;
+export declare const getDecryptedSecretsHelper: ({ apiRequest, workspaceId, environment, workspaceKey, path, includeImports }: GetDecryptedSecretsParams) => Promise<ISecretBundle[]>;
 /**
  * Get a (decrypted) secret
  * @param {GetDecryptedSecretParams} getDecryptedSecretParams
