@@ -1,4 +1,5 @@
 import { AxiosInstance } from "axios";
+import { ISecret } from "./models";
 
 export interface ApiRequestInterceptorProps {
     baseURL: string;
@@ -9,6 +10,7 @@ export interface GetSecretsDTO {
     workspaceId: string;
     environment: string;
     path: string;
+    includeImports: boolean
 }
 
 export interface GetSecretDTO {
@@ -53,6 +55,18 @@ export interface DeleteSecretDTO {
     environment: string;
     path: string;
     type: 'shared' | 'personal';
+}
+
+export interface ImportedSecrets {
+    environment: string;
+    folderId: string;
+    secretPath: string;
+    secrets: ISecret[];
+}
+
+export type AllSecretsResponse = {
+    secrets: ISecret[],
+    imports: ImportedSecrets[]
 }
 
 export { AxiosInstance };

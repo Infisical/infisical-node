@@ -45,9 +45,9 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             path: options.path,
             type: options.type
         });
-        
+
         instance.cache[`${secretBundle.type}-${secretBundle.secretName}`] = secretBundle;
-        
+
         return secretBundle;
 
     } catch (err) {
@@ -80,13 +80,15 @@ export async function getAllSecretsHelper(instance: InfisicalClient, options: Ge
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
             environment: options.environment,
-            path: options.path
+            path: options.path,
+            includeImports: options.includeImports
+
         });
 
         secretBundles.forEach((secretBundle) => {
             const cacheKey = `${secretBundle.type}-${secretBundle.secretName}`;
             instance.cache[cacheKey] = secretBundle;
-            
+
             if (options.attachToProcessEnv) {
                 process.env[secretBundle.secretName] = secretBundle.secretValue;
             }
