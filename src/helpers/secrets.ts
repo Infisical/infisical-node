@@ -65,15 +65,44 @@ export const getDecryptedSecretsHelper = async ({
     workspaceId,
     environment,
     workspaceKey,
-    path
+    path,
+    includeImports
 }: GetDecryptedSecretsParams) => {
-    const secrets = await getSecrets(apiRequest, {
+    const { secrets, imports } = await getSecrets(apiRequest, {
         workspaceId,
         environment,
-        path
+        path,
+        includeImports
     });
 
-    return secrets.map((secret) => {
+    const importedSecrets: ISecretBundle[] = []
+    for (const singleImport of imports) {
+        for (const secret of singleImport.secrets) {
+            const secretName = decryptSymmetric128BitHexKeyUTF8({
+                ciphertext: secret.secretKeyCiphertext,
+                iv: secret.secretKeyIV,
+                tag: secret.secretKeyTag,
+                key: workspaceKey
+            });
+
+            const secretValue = decryptSymmetric128BitHexKeyUTF8({
+                ciphertext: secret.secretValueCiphertext,
+                iv: secret.secretValueIV,
+                tag: secret.secretValueTag,
+                key: workspaceKey
+            });
+
+            const transformedSecret = transformSecretToSecretBundle({
+                secret,
+                secretName,
+                secretValue
+            });
+
+            importedSecrets.push(transformedSecret)
+        }
+    }
+
+    const topLevelSecrets: ISecretBundle[] = secrets.map((secret) => {
         const secretName = decryptSymmetric128BitHexKeyUTF8({
             ciphertext: secret.secretKeyCiphertext,
             iv: secret.secretKeyIV,
@@ -94,6 +123,23 @@ export const getDecryptedSecretsHelper = async ({
             secretValue
         });
     });
+
+    const hasOverridden: any = {};
+    for (const sec of topLevelSecrets) {
+        hasOverridden[sec.secretName] = true;
+    }
+
+    // go backwards because the last import overrides any other imports
+    for (let i = importedSecrets.length - 1; i >= 0; i--) {
+        const importedSecret = importedSecrets[i];
+
+        if (!hasOverridden[importedSecret.secretName]) {
+            topLevelSecrets.push(importedSecret);
+            hasOverridden[importedSecret.secretName] = true;
+        }
+    }
+
+    return topLevelSecrets
 }
 
 /**

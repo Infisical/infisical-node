@@ -50,9 +50,10 @@ export interface GetAllOptions {
     environment: string;
     path: string;
     attachToProcessEnv: boolean;
+    includeImports: boolean
 }
 
-export interface GetOptions extends Options {}
-export interface CreateOptions extends Options {}
-export interface UpdateOptions extends Options {}
-export interface DeleteOptions extends Options {}
+export interface GetOptions extends Options { }
+export interface CreateOptions extends Options { }
+export interface UpdateOptions extends Options { }
+export interface DeleteOptions extends Options { }

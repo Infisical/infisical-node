@@ -74,7 +74,8 @@ class InfisicalClient {
         options: GetAllOptions = {
             environment: "dev",
             path: "/",
-            attachToProcessEnv: false
+            attachToProcessEnv: false,
+            includeImports: false
         }
     ): Promise<ISecretBundle[]> {
         return await getAllSecretsHelper(this, options);

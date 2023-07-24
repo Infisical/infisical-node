@@ -4,21 +4,26 @@ import {
     GetSecretDTO,
     CreateSecretDTO,
     UpdateSecretDTO,
-    DeleteSecretDTO
+    DeleteSecretDTO,
+    AllSecretsResponse
 } from '../../types/api';
 import { ISecret } from '../../types/models';
 
 export const getSecrets = async (apiRequest: AxiosInstance, options: GetSecretsDTO) => {
-    const { data: { secrets } } = await apiRequest.get<{ secrets: ISecret[] }>(
+    const { data: { secrets, imports } } = await apiRequest.get<AllSecretsResponse>(
         '/api/v3/secrets', {
         params: {
             workspaceId: options.workspaceId,
             environment: options.environment,
-            secretPath: options.path
+            secretPath: options.path,
+            include_imports: options.includeImports
         }
     });
 
-    return secrets;
+    return {
+        secrets: secrets ? secrets : [],
+        imports: imports ? imports : []
+    };
 }
 
 export const getSecret = async (apiRequest: AxiosInstance, options: GetSecretDTO) => {
@@ -49,7 +54,7 @@ export const createSecret = async (apiRequest: AxiosInstance, options: CreateSec
         secretValueTag: options.secretValueTag,
         secretPath: options.path
     });
-    
+
     return secret;
 }
 
@@ -71,14 +76,14 @@ export const updateSecret = async (apiRequest: AxiosInstance, options: UpdateSec
 export const deleteSecret = async (apiRequest: AxiosInstance, options: DeleteSecretDTO) => {
     const { data: { secret } } = await apiRequest.delete<{ secret: ISecret }>(
         `/api/v3/secrets/${options.secretName}`, {
-            data: {
-                workspaceId: options.workspaceId,
-                environment: options.environment,
-                type: options.type,
-                secretPath: options.path
-            }
+        data: {
+            workspaceId: options.workspaceId,
+            environment: options.environment,
+            type: options.type,
+            secretPath: options.path
         }
+    }
     );
-    
+
     return secret;
 }

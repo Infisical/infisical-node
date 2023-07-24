@@ -127,6 +127,8 @@ The SDK caches every secret and updates it periodically based on the provided `c
 const secrets = await client.getAllSecrets({
   environment: "dev",
   path: "/foo/bar/",
+  attachToProcessEnv: false,
+  includeImports: false
 });
 ```
 
@@ -138,6 +140,7 @@ Retrieve all secrets within a given environment and folder path. The service tok
   - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
   - `path` The path from where secrets should be fetched from
   - `attachToProcessEnv` (boolean, optional): Whether or not to attach fetched secrets to `process.env`. If not specified, the default value is `false`.
+  - `includeImports` (boolean, optional): Whether or not to include imported secrets from the current path. Read about [secret import](https://infisical.com/docs/documentation/platform/secret-reference#import-entire-folders).
 
 ## Get Secret
 
