@@ -75,7 +75,7 @@ class InfisicalClient {
             environment: "dev",
             path: "/",
             attachToProcessEnv: false,
-            includeImports: false
+            includeImports: true
         }
     ): Promise<ISecretBundle[]> {
         return await getAllSecretsHelper(this, options);
