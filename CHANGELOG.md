@@ -2,7 +2,7 @@
 
 All notable changes will be documented in this file.
 
-## [1.4.0] - 2023-07-29
+## [1.5.0] - 2023-09-29
 
 This version adds support for the Service Token V3 (Beta) authentication method for Infisical which is a JSON; note that it continues to support Service Token V2 (the default authentication method at this time). With this update, it's possible to initialize the InfisicalClient with a Service Token V3 JSON via the `tokenJSON` parameter to perform CRUD secret operations.
 
@@ -15,6 +15,11 @@ const client = new InfisicalClient({
     debug: true
 });
 ```
+
+## [1.4.2] - 2023-07-24
+
+The versions `1.4.0` to `1.4.2` add support for `includeImports` parameter to the `getAllSecrets` method. Since you can now configure Infisical to import secrets from one folder A into folder B, then setting `includeImports` to `true` when fetching secrets for folder B will include the secrets in folder A, granted
+that the service token has appropriate permissions to access folder A. 
 
 ## [1.3.2] - 2023-07-13
 
