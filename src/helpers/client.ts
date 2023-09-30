@@ -7,7 +7,7 @@ import {
     DeleteOptions
 } from '../types/InfisicalClient';
 import { SecretService } from '../services';
-import { ISecretBundle, Scope } from '../types/models';
+import { ISecretBundle } from '../types/models';
 
 export async function getSecretHelper(instance: InfisicalClient, secretName: string, options: GetOptions): Promise<ISecretBundle> {
     const cacheKey = `${options.type}-${secretName}`;
@@ -35,7 +35,6 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
                 return cachedSecret;
             }
         }
-
         const secretBundle = await SecretService.getDecryptedSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
@@ -82,7 +81,6 @@ export async function getAllSecretsHelper(instance: InfisicalClient, options: Ge
             environment: options.environment,
             path: options.path,
             includeImports: options.includeImports
-
         });
 
         secretBundles.forEach((secretBundle) => {

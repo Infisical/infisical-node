@@ -1,1 +1,1 @@
-export { getServiceTokenData } from './queries';
+export * from "./queries";

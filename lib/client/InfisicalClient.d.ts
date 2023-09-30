@@ -1,11 +1,11 @@
 import { ISecretBundle } from '../types/models';
-import { ServiceTokenClientConfig, GetAllOptions, GetOptions, CreateOptions, UpdateOptions, DeleteOptions, InfisicalClientOptions } from '../types/InfisicalClient';
+import { ClientConfig, GetAllOptions, GetOptions, CreateOptions, UpdateOptions, DeleteOptions, InfisicalClientOptions } from '../types/InfisicalClient';
 import { IEncryptSymmetricOutput } from '../types/utils';
 declare class InfisicalClient {
     cache: {
         [key: string]: ISecretBundle;
     };
-    clientConfig: ServiceTokenClientConfig | undefined;
+    clientConfig: ClientConfig | undefined;
     debug: boolean;
     /**
      * Create an instance of the Infisical client
@@ -14,7 +14,7 @@ declare class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor({ token, siteURL, debug, cacheTTL }: InfisicalClientOptions);
+    constructor({ token, tokenJson, siteURL, debug, cacheTTL }: InfisicalClientOptions);
     /**
     * Return all the secrets accessible by the instance of Infisical
     */

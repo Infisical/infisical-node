@@ -55,12 +55,18 @@ export const encryptAsymmetric = ({ plaintext, publicKey, privateKey }: IEncrypt
  * @param {String} obj.privateKey - private key of the receiver (current user)
  * @param {String} plaintext - UTF8 plaintext
  */
-export const decryptAsymmetric = ({ ciphertext, nonce, publicKey, privateKey }: IDecryptAsymmetricInput) => nacl.box.open(
+export const decryptAsymmetric = ({ ciphertext, nonce, publicKey, privateKey }: IDecryptAsymmetricInput) => {
+    const plaintext: Uint8Array | null = nacl.box.open(
         util.decodeBase64(ciphertext),
         util.decodeBase64(nonce),
         util.decodeBase64(publicKey),
         util.decodeBase64(privateKey)
-);
+    );
+    
+    if (plaintext == null) throw Error("Invalid ciphertext or keys");
+    
+    return util.encodeUTF8(plaintext);
+}
 
 /**
  * Return new base64-encoded, 256-bit symmetric key 

@@ -24,7 +24,7 @@ export declare const encryptAsymmetric: ({ plaintext, publicKey, privateKey }: I
  * @param {String} obj.privateKey - private key of the receiver (current user)
  * @param {String} plaintext - UTF8 plaintext
  */
-export declare const decryptAsymmetric: ({ ciphertext, nonce, publicKey, privateKey }: IDecryptAsymmetricInput) => Uint8Array | null;
+export declare const decryptAsymmetric: ({ ciphertext, nonce, publicKey, privateKey }: IDecryptAsymmetricInput) => string;
 /**
  * Return new base64-encoded, 256-bit symmetric key
  * @returns {String} key - new symmetric key

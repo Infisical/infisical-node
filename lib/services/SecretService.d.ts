@@ -1,10 +1,10 @@
 import { GetFallbackSecretParams, GetDecryptedSecretsParams, GetDecryptedSecretParams, CreateSecretParams, UpdateSecretParams, DeleteSecretParams } from '../types/SecretService';
-import { ServiceTokenClientConfig } from '../types/InfisicalClient';
+import { ClientConfig } from '../types/InfisicalClient';
 /**
  * Class for secret-related actions
  */
 export default class SecretService {
-    static populateClientWorkspaceConfig(clientConfig: ServiceTokenClientConfig): Promise<import("../types/InfisicalClient").WorkspaceConfig>;
+    static populateClientWorkspaceConfig(clientConfig: ClientConfig): Promise<import("../types/InfisicalClient").WorkspaceConfig>;
     /**
      * Get fallback secret on [process.env]
      */

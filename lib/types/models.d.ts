@@ -51,3 +51,13 @@ export interface Scope {
     envSlug: string;
     path: string
 }
+
+export interface ServiceTokenDataKeyRes {
+    key: {
+        _id: string;    
+        workspace: string;
+        encryptedKey: string;
+        publicKey: string;
+        nonce: string;
+    }
+}
