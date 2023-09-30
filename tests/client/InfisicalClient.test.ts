@@ -7,6 +7,7 @@ describe('InfisicalClient', () => {
     beforeAll(async () => {
         client = new InfisicalClient({
             token: process.env.INFISICAL_TOKEN!,
+            tokenJson: process.env.INFISICAL_TOKEN_JSON!,
             siteURL: process.env.SITE_URL!,
             debug: true
         });

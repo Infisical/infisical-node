@@ -18,14 +18,15 @@ import {
     populateClientWorkspaceConfigsHelper
 } from '../helpers/key';
 
-import { ServiceTokenClientConfig } from '../types/InfisicalClient';
+
+import { ClientConfig } from '../types/InfisicalClient';
 
 /**
  * Class for secret-related actions
  */
 export default class SecretService {
     
-    static async populateClientWorkspaceConfig(clientConfig: ServiceTokenClientConfig) {
+    static async populateClientWorkspaceConfig(clientConfig: ClientConfig) {
         return await populateClientWorkspaceConfigsHelper(clientConfig);
     }
 

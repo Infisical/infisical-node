@@ -2,6 +2,20 @@
 
 All notable changes will be documented in this file.
 
+## [1.4.0] - 2023-07-29
+
+This version adds support for the Service Token V3 (Beta) authentication method for Infisical which is a JSON; note that it continues to support Service Token V2 (the default authentication method at this time). With this update, it's possible to initialize the InfisicalClient with a Service Token V3 JSON via the `tokenJSON` parameter to perform CRUD secret operations.
+
+Example:
+
+```
+const client = new InfisicalClient({
+    tokenJson: process.env.INFISICAL_TOKEN_JSON!,
+    siteURL: process.env.SITE_URL!,
+    debug: true
+});
+```
+
 ## [1.3.2] - 2023-07-13
 
 This version adds support for attaching fetched secrets to `process.env` object by setting the `attachToProcessEnv` option on `getAllSecrets`.

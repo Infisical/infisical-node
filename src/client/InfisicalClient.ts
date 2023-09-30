@@ -1,8 +1,11 @@
-import { INFISICAL_URL, AUTH_MODE_SERVICE_TOKEN } from '../variables';
+import { 
+    INFISICAL_URL, 
+    AuthMode,
+} from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
-import { ISecretBundle, Scope } from '../types/models';
+import { ISecretBundle } from '../types/models';
 import {
-    ServiceTokenClientConfig,
+    ClientConfig,
     GetAllOptions,
     GetOptions,
     CreateOptions,
@@ -31,7 +34,7 @@ class InfisicalClient {
 
     public cache: { [key: string]: ISecretBundle } = {}
 
-    public clientConfig: ServiceTokenClientConfig | undefined = undefined;
+    public clientConfig: ClientConfig | undefined = undefined;
     public debug: boolean = false;
 
     /**
@@ -43,6 +46,7 @@ class InfisicalClient {
      */
     constructor({
         token = undefined,
+        tokenJson = undefined,
         siteURL = INFISICAL_URL,
         debug = false,
         cacheTTL = 300
@@ -52,13 +56,30 @@ class InfisicalClient {
             const serviceToken = token.substring(0, lastDotIdx);
 
             this.clientConfig = {
-                authMode: AUTH_MODE_SERVICE_TOKEN,
+                authMode: AuthMode.SERVICE_TOKEN,
                 credentials: {
                     serviceTokenKey: token.substring(lastDotIdx + 1)
                 },
                 apiRequest: createApiRequestWithAuthInterceptor({
                     baseURL: siteURL,
                     serviceToken
+                }),
+                cacheTTL
+            }
+        }
+        
+        if (tokenJson && tokenJson !== "") {
+            const tokenObj = JSON.parse(tokenJson);
+            
+            this.clientConfig = {
+                authMode: AuthMode.SERVICE_TOKEN_V3,
+                credentials: {
+                    publicKey: tokenObj.publicKey,
+                    privateKey: tokenObj.privateKey
+                },
+                apiRequest: createApiRequestWithAuthInterceptor({
+                    baseURL: siteURL,
+                    serviceToken: tokenObj.serviceToken
                 }),
                 cacheTTL
             }
