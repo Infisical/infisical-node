@@ -108,7 +108,7 @@ const client = new InfisicalClient({
 
 Using Infisical Token V3 (Beta):
 
-In `v1.4.0`, we released a superior token authentication method; this credential is a JSON containing a `publicKey`, privateKey`, and `serviceToken` and can be used to initialize the Node SDK client instead of the regular Infisical Token.
+In `v1.4.0`, we released a superior token authentication method; this credential is a JSON containing a `publicKey`, `privateKey`, and `serviceToken` and can be used to initialize the Node SDK client instead of the regular service token.
 
 You can use this beta feature like so:
 
