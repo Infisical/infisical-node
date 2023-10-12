@@ -15,6 +15,7 @@ import {
 } from '../types/SecretService';
 import { ISecret, ISecretBundle } from '../types/models';
 import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from '../utils/crypto';
+import { expandSecrets } from './expandSecrets';
 
 /**
  * Transform a raw secret returned from the API plus [secretName]
@@ -68,6 +69,9 @@ export const getDecryptedSecretsHelper = async ({
     path,
     includeImports
 }: GetDecryptedSecretsParams) => {
+
+    const content: Record<string, { value: string; comment?: string; skipMultilineEncoding?: boolean }> = {};
+
     const { secrets, imports } = await getSecrets(apiRequest, {
         workspaceId,
         environment,
@@ -92,6 +96,8 @@ export const getDecryptedSecretsHelper = async ({
                 key: workspaceKey
             });
 
+            content[secretName] = { value: secretValue };
+
             const transformedSecret = transformSecretToSecretBundle({
                 secret,
                 secretName,
@@ -102,7 +108,7 @@ export const getDecryptedSecretsHelper = async ({
         }
     }
 
-    const topLevelSecrets: ISecretBundle[] = secrets.map((secret) => {
+    let topLevelSecrets: ISecretBundle[] = secrets.map((secret) => {
         const secretName = decryptSymmetric128BitHexKeyUTF8({
             ciphertext: secret.secretKeyCiphertext,
             iv: secret.secretKeyIV,
@@ -117,6 +123,8 @@ export const getDecryptedSecretsHelper = async ({
             key: workspaceKey
         });
 
+        content[secretName] = { value: secretValue };
+
         return transformSecretToSecretBundle({
             secret,
             secretName,
@@ -128,7 +136,7 @@ export const getDecryptedSecretsHelper = async ({
     for (const sec of topLevelSecrets) {
         hasOverridden[sec.secretName] = true;
     }
-
+    
     // go backwards because the last import overrides any other imports
     for (let i = importedSecrets.length - 1; i >= 0; i--) {
         const importedSecret = importedSecrets[i];
@@ -138,6 +146,25 @@ export const getDecryptedSecretsHelper = async ({
             hasOverridden[importedSecret.secretName] = true;
         }
     }
+
+    const expandedSecrets = await expandSecrets(
+        workspaceId.toString(),
+        workspaceKey,
+        apiRequest,
+        environment,
+        path,
+        content,
+        includeImports
+    );
+
+    const secretValues = Object.values(expandedSecrets).map(secret => secret.value);
+
+    // console.log("secretValues:", secretValues);
+
+    topLevelSecrets = topLevelSecrets.map((bundle, index) => ({
+        ...bundle,
+        secretValue: secretValues[index]
+    }));
 
     return topLevelSecrets
 }
@@ -157,12 +184,14 @@ export const getDecryptedSecretHelper = async ({
     path
 }: GetDecryptedSecretParams): Promise<ISecretBundle> => {
 
+    const content: Record<string, { value: string; comment?: string; skipMultilineEncoding?: boolean }> = {};
+
     const secret = await getSecret(apiRequest, {
         secretName,
         workspaceId,
         environment,
         type,
-        path
+        path,
     });
 
     const secretValue = decryptSymmetric128BitHexKeyUTF8({
@@ -172,10 +201,24 @@ export const getDecryptedSecretHelper = async ({
         key: workspaceKey
     });
 
+    content[secretName] = { value: secretValue };
+
+    // NB. this function needs to be refactored to allow for a single secret
+    const expandedSecret = await expandSecrets(
+        workspaceId.toString(),
+        workspaceKey,
+        apiRequest,
+        environment,
+        path,
+        { ...content }
+    );
+
+    const expandedSecretValue = expandedSecret.value as unknown as string;
+
     return transformSecretToSecretBundle({
         secret,
         secretName,
-        secretValue
+        secretValue: expandedSecretValue
     });
 }
 
