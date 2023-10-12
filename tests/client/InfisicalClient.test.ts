@@ -28,6 +28,11 @@ describe('InfisicalClient', () => {
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
+        await client.deleteSecret('KEY_ONE', {
+            type: "personal",
+            environment: "dev",
+            path: "/",
+        });
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
         await client.deleteSecret('NESTED_SECRET_1');
@@ -131,8 +136,15 @@ describe('InfisicalClient', () => {
         expect(secret.type).toBe('shared');
     });
 
-    it('Fetch nested shared secrets', async () => {
-        const secrets = await client.getAllSecrets({ environment: "dev", path: "/", attachToProcessEnv: false, includeImports: true });
+    it('get nested shared secret', async () => {
+        const secret = await client.getSecret('FULL_HOST');
+
+        expect(secret.secretName).toBe('FULL_HOST');
+        expect(secret.secretValue).toBe('https://www.infisical.com');
+    });
+
+    it('get nested shared secrets', async () => {
+        const secrets = await client.getAllSecrets();
 
         const expectedValues = [
             'DEEPLY_NESTED_SECRET',
