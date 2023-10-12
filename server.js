@@ -1,69 +1,127 @@
-// development test file only
+// this is a development test file only
 require('dotenv').config();
 const InfisicalClient = require("./lib");
 
-const config = {
-  token: process.env.INFISICAL_TOKEN,
-};
-
 async function fetchData() {
   try {
-    const client = new InfisicalClient(config);
+    const client = new InfisicalClient({
+      token: process.env.INFISICAL_TOKEN
+    });
 
-    // create nested secrets that all resolve to the deeply nested value
     await client.createSecret("NESTED_SECRET_1", "${NESTED_SECRET_2}");
     await client.createSecret("NESTED_SECRET_2", "${NESTED_SECRET_3}");
     await client.createSecret("NESTED_SECRET_3", "DEEPLY_NESTED_SECRET");
 
-    // create secrets that are part of a nested secret
     await client.createSecret("PROTOCOL", "https");
     await client.createSecret("DOMAIN", "www.infisical.com");
     await client.createSecret("FULL_HOST", "${PROTOCOL}://${DOMAIN}");
 
-    // fetch all of the nested secrets
-    const secrets = await client.getAllSecrets({ environment: "dev", path: "/", attachToProcessEnv: false, includeImports: true });
+    const secret1 = await client.getSecret('NESTED_SECRET_1');
+    const secret2 = await client.getSecret('NESTED_SECRET_2');
+    const secret3 = await client.getSecret('NESTED_SECRET_3');
+    const secret4 = await client.getSecret('PROTOCOL');
+    const secret5 = await client.getSecret('DOMAIN');
+    const secret6 = await client.getSecret('FULL_HOST');
+    
+    const getSecretArray = [secret1, secret2, secret3];
 
     // eslint-disable-next-line no-console
-    console.log("secrets:", secrets);
+    console.log("secret1:", secret1);
+    // eslint-disable-next-line no-console
+    console.log("secret2:", secret2);
+    // eslint-disable-next-line no-console
+    console.log("secret3:", secret3);
+    // eslint-disable-next-line no-console
+    console.log("secret4:", secret4);
+    // eslint-disable-next-line no-console
+    console.log("secret5:", secret5);
+    // eslint-disable-next-line no-console
+    console.log("secret6:", secret6);
 
-    // check the return values are what we expect
-    const expectedValues = [
+    const expectedGetSecretValues = [
+        'DEEPLY_NESTED_SECRET',
+        'https://www.infisical.com'
+    ];
+
+    let getSecretTestsPass = true;
+    for (const ev of expectedGetSecretValues) {
+        const count = getSecretArray.filter(s => s.secretValue === ev).length;
+        if (ev === 'DEEPLY_NESTED_SECRET') {
+            if (count !== 3) {
+                getSecretTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 3, Actual count: ${count}`);
+            }
+        } else if (ev === 'https') {
+            if (count !== 1) {
+                getSecretTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 1, Actual count: ${count}`);
+            }
+        } else if (ev === 'www.infisical.com') {
+            if (count !== 1) {
+                getSecretTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 1, Actual count: ${count}`);
+            }
+        } else if (ev === 'https://www.infisical.com') {
+            if (count !== 1) {
+                getSecretTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 1, Actual count: ${count}`);
+            }
+        }
+    }
+
+    if (getSecretTestsPass) {
+        console.log("getSecret tests passed!");
+    } else {
+        console.log("Some of the getSecret tests failed.");
+    }
+
+    const getAllSecretsArray = await client.getAllSecrets();
+
+    // eslint-disable-next-line no-console
+    console.log("getAllSecretsArray:", getAllSecretsArray);
+
+    const expectedGetAllSecretsValues = [
         'DEEPLY_NESTED_SECRET',
         'https',
         'www.infisical.com',
         'https://www.infisical.com'
     ];
 
-    let allTestsPass = true;
-
-    for (const expectedValue of expectedValues) {
-        const count = secrets.filter(secret => secret.secretValue === expectedValue).length;
-        if (expectedValue === 'DEEPLY_NESTED_SECRET') {
+    let getAllSecretsTestsPass = true;
+    for (const ev of expectedGetAllSecretsValues) {
+        const count = getAllSecretsArray.filter(s => s.secretValue === ev).length;
+        if (ev === 'DEEPLY_NESTED_SECRET') {
             if (count !== 3) {
-                allTestsPass = false;
-                console.log(`Test failed for ${expectedValue}. Expected count: 3, Actual count: ${count}`);
+                getAllSecretsTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 3, Actual count: ${count}`);
             }
         } else {
             if (count !== 1) {
-                allTestsPass = false;
-                console.log(`Test failed for ${expectedValue}. Expected count: 1, Actual count: ${count}`);
+                getAllSecretsTestsPass = false;
+                console.log(`Test failed for ${ev}. Expected count: 1, Actual count: ${count}`);
             }
         }
     }
 
-    if (allTestsPass) {
-        console.log("All tests pass!");
+    if (getAllSecretsTestsPass) {
+        console.log("All getAllSecrets tests passed!");
     } else {
-        console.log("Some tests failed.");
+        console.log("Some of the getAllSecrets tests failed.");
     }
 
-    // cleanup all of the created secrets
+    if (getSecretTestsPass && getAllSecretsTestsPass) {
+        console.log("All tests passed!");
+    } else {
+        console.log("Some of the tests failed.");
+    }
+
     await client.deleteSecret('NESTED_SECRET_1');
     await client.deleteSecret('NESTED_SECRET_2');
     await client.deleteSecret('NESTED_SECRET_3');
     await client.deleteSecret('PROTOCOL');
     await client.deleteSecret('DOMAIN');
     await client.deleteSecret('FULL_HOST');
+
   } catch (err) {
     console.error("Error fetching data:", err);
   }
