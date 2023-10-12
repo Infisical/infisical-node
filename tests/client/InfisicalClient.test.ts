@@ -18,13 +18,25 @@ describe('InfisicalClient', () => {
             path: "/"
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
-    }, 10000);
+        await client.createSecret("NESTED_SECRET_1", "${NESTED_SECRET_2}");
+        await client.createSecret("NESTED_SECRET_2", "${NESTED_SECRET_3}");
+        await client.createSecret("NESTED_SECRET_3", "DEEPLY_NESTED_SECRET");
+        await client.createSecret("PROTOCOL", "https");
+        await client.createSecret("DOMAIN", "www.infisical.com");
+        await client.createSecret("FULL_HOST", "${PROTOCOL}://${DOMAIN}");
+    }, 20000);
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
-    }, 10000);
+        await client.deleteSecret('NESTED_SECRET_1');
+        await client.deleteSecret('NESTED_SECRET_2');
+        await client.deleteSecret('NESTED_SECRET_3');
+        await client.deleteSecret('PROTOCOL');
+        await client.deleteSecret('DOMAIN');
+        await client.deleteSecret('FULL_HOST');
+    }, 20000);
 
     it('get overriden personal secret', async () => {
         const secret = await client.getSecret('KEY_ONE', {
@@ -117,6 +129,26 @@ describe('InfisicalClient', () => {
         expect(secret.secretName).toBe('KEY_FOUR');
         expect(secret.secretValue).toBe('KEY_FOUR_VAL');
         expect(secret.type).toBe('shared');
+    });
+
+    it('Fetch nested shared secrets', async () => {
+        const secrets = await client.getAllSecrets({ environment: "dev", path: "/", attachToProcessEnv: false, includeImports: true });
+
+        const expectedValues = [
+            'DEEPLY_NESTED_SECRET',
+            'https',
+            'www.infisical.com',
+            'https://www.infisical.com'
+        ];
+
+        for (const expectedValue of expectedValues) {
+            const count = secrets.filter(secret => secret.secretValue === expectedValue).length;
+            if (expectedValue === 'DEEPLY_NESTED_SECRET') {
+                expect(count).toBe(3);
+            } else {
+                expect(count).toBe(1);
+            }
+        }
     });
 
     it('attach all to process.env', async () => {
