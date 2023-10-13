@@ -1,5 +1,5 @@
 require('dotenv').config();
-import { describe, expect } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect } from '@jest/globals';
 import InfisicalClient from '../../src';
 
 describe('InfisicalClient', () => {
