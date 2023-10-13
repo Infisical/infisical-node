@@ -2,6 +2,8 @@ require('dotenv').config();
 import { afterAll, beforeAll, describe, expect } from '@jest/globals';
 import InfisicalClient from '../../src';
 
+// please first create a folder called "db-secrets" in the "dev" environment to run these tests
+
 describe('InfisicalClient', () => {
     let client: InfisicalClient;
     beforeAll(async () => {
@@ -18,30 +20,75 @@ describe('InfisicalClient', () => {
             path: "/"
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
-        await client.createSecret("NESTED_SECRET_1", "${NESTED_SECRET_2}");
-        await client.createSecret("NESTED_SECRET_2", "${NESTED_SECRET_3}");
-        await client.createSecret("NESTED_SECRET_3", "DEEPLY_NESTED_SECRET");
+
+        await client.createSecret("SECRET_REF_1", "${SECRET_REF_2}");
+        await client.createSecret("SECRET_REF_2", "${SECRET_REF_3}");
+        await client.createSecret("SECRET_REF_3", "DEEPLY_NESTED_SECRET");
+
         await client.createSecret("PROTOCOL", "https");
-        await client.createSecret("DOMAIN", "www.infisical.com");
-        await client.createSecret("FULL_HOST", "${PROTOCOL}://${DOMAIN}");
-    }, 20000);
+        await client.createSecret("HOSTNAME", "www.infisical.com");
+        await client.createSecret("FULL_HOST", "${PROTOCOL}://${HOSTNAME}");
+
+        await client.createSecret("USERNAME", "admin2023", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("PASSWORD", "Supersecret123", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("PORT", "4000", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("DB_NAME", "dev", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("MONGO_URL", "mongodb://${dev.db-secrets.USERNAME}:${dev.db-secrets.PASSWORD}@${HOSTNAME}:${dev.db-secrets.PORT}/${dev.db-secrets.DB_NAME}");
+    }, 30000);
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
         await client.deleteSecret('KEY_ONE', {
             type: "personal",
             environment: "dev",
-            path: "/",
+            path: "/"
         });
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
-        await client.deleteSecret('NESTED_SECRET_1');
-        await client.deleteSecret('NESTED_SECRET_2');
-        await client.deleteSecret('NESTED_SECRET_3');
+        await client.deleteSecret('SECRET_REF_1');
+        await client.deleteSecret('SECRET_REF_2');
+        await client.deleteSecret('SECRET_REF_3');
         await client.deleteSecret('PROTOCOL');
-        await client.deleteSecret('DOMAIN');
+        await client.deleteSecret('HOSTNAME');
         await client.deleteSecret('FULL_HOST');
-    }, 20000);
+        await client.deleteSecret('USERNAME', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('PASSWORD', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('PORT', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('DB_NAME', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('MONGO_URL');
+    }, 30000);
 
     it('get overriden personal secret', async () => {
         const secret = await client.getSecret('KEY_ONE', {
@@ -136,21 +183,22 @@ describe('InfisicalClient', () => {
         expect(secret.type).toBe('shared');
     });
 
-    it('get nested shared secret', async () => {
+    it('get shared secret - secret reference', async () => {
         const secret = await client.getSecret('FULL_HOST');
 
         expect(secret.secretName).toBe('FULL_HOST');
         expect(secret.secretValue).toBe('https://www.infisical.com');
     });
 
-    it('get nested shared secrets', async () => {
+    it('get all secrets - secret references', async () => {
         const secrets = await client.getAllSecrets();
 
         const expectedValues = [
             'DEEPLY_NESTED_SECRET',
             'https',
             'www.infisical.com',
-            'https://www.infisical.com'
+            'https://www.infisical.com',
+            'mongodb://admin2023:Supersecret123@www.infisical.com:4000/dev'
         ];
 
         for (const expectedValue of expectedValues) {
