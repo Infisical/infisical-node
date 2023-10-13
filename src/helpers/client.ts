@@ -22,7 +22,6 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
         cachedSecret = instance.cache[cacheKey];
 
         if (cachedSecret) {
-
             const currentTime = new Date();
             const cacheExpiryTime = cachedSecret.lastFetchedAt;
             cacheExpiryTime.setSeconds(cacheExpiryTime.getSeconds() + instance.clientConfig.cacheTTL);
@@ -35,6 +34,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
                 return cachedSecret;
             }
         }
+
         const secretBundle = await SecretService.getDecryptedSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,

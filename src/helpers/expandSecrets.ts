@@ -25,17 +25,18 @@ const fetchSecretsCrossEnv = ({
   const fetchCache: Record<string, Record<string, string>> = {};
 
   return async (secRefEnv: string, secRefPath: string[], secRefKey: string) => {
-    const secRefPathUrl = path.join("/", ...secRefPath);
+    const secRefPathUrl = path.posix.join('/', ...secRefPath); // ensure compatability for Windows
     const uniqKey = `${secRefEnv}-${secRefPathUrl}`;
 
     if (fetchCache?.[uniqKey]) {
+      console.log("Returning cached value")
       return fetchCache[uniqKey][secRefKey];
     }
 
     const { secrets } = await getSecrets(apiRequest, {
         workspaceId,
         environment,
-        path: secretPath,
+        path: secRefPathUrl,
         includeImports
     });
 
@@ -80,7 +81,7 @@ const recursivelyExpandSecret = async (
 
   if (!interpolatedValue) {
     // eslint-disable-next-line no-console
-    // console.error(`Couldn't find referenced value - ${key}`);
+    console.error(`Couldn't find referenced value - ${key}`);
     return "";
   }
 
@@ -88,19 +89,30 @@ const recursivelyExpandSecret = async (
 
   if (refs) {
     const resolvedValues = [];
-
     for (const interpolationSyntax of refs) {
-      const interpolationKey = interpolationSyntax.slice(2, -1);
+      const interpolationKey = interpolationSyntax.slice(2, interpolationSyntax.length - 1);
+      const entities = interpolationKey.trim().split(".");
 
-      const val = await recursivelyExpandSecret(
-        expandedSec,
-        interpolatedSec,
-        fetchCrossEnv,
-        recursionChainBreaker,
-        interpolationKey
-      );
+      if (entities.length === 1) {
+        const val = await recursivelyExpandSecret(
+          expandedSec,
+          interpolatedSec,
+          fetchCrossEnv,
+          recursionChainBreaker,
+          interpolationKey
+        );
+        if (val) resolvedValues.push({ interpolationSyntax, val });
+        continue;
+      }
 
-      if (val) resolvedValues.push({ interpolationSyntax, val });
+      if (entities.length > 1) {
+        const secRefEnv = entities[0];
+        const secRefPath = entities.slice(1, entities.length - 1);
+        const secRefKey = entities[entities.length - 1];
+
+        const val = await fetchCrossEnv(secRefEnv, secRefPath, secRefKey);
+        if (val) resolvedValues.push({ interpolationSyntax, val });
+      }
     }
 
     resolvedValues.forEach(({ interpolationSyntax, val }) => {

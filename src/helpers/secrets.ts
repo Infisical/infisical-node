@@ -159,8 +159,6 @@ export const getDecryptedSecretsHelper = async ({
 
     const secretValues = Object.values(expandedSecrets).map(secret => secret.value);
 
-    // console.log("secretValues:", secretValues);
-
     topLevelSecrets = topLevelSecrets.map((bundle, index) => ({
         ...bundle,
         secretValue: secretValues[index]
@@ -203,14 +201,13 @@ export const getDecryptedSecretHelper = async ({
 
     content[secretName] = { value: secretValue };
 
-    // NB. this function needs to be refactored to allow for a single secret
     const expandedSecret = await expandSecrets(
         workspaceId.toString(),
         workspaceKey,
         apiRequest,
         environment,
         path,
-        { ...content }
+        content
     );
 
     const expandedSecretValue = expandedSecret.value as unknown as string;
