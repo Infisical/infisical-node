@@ -115,7 +115,6 @@ class InfisicalClient {
             type: "shared",
             environment: "dev",
             path: "/",
-            includeImports: false
         }
     ): Promise<ISecretBundle> {
         return await getSecretHelper(this, secretName, options);
