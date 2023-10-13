@@ -1,3 +1,8 @@
 node_modules
 .env
 .prettierrc
+
+# Infisical init
+.infisical.json
+# Infisical scan report
+leaks-report.json

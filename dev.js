@@ -1,25 +1,20 @@
 // this is a development test file only!!!
 // please first create a folder called "db-secrets" in the "dev" environment to run these tests
-
 require('dotenv').config();
 const InfisicalClient = require("./lib");
 
 function generateRandomSecretName() {
     const getRandomString = (len) => {
         let res = '';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // infisical-scan:ignore
         for (let i = 0; i < len; i++) {
             const randIdx = Math.floor(Math.random() * chars.length);
             res += chars.charAt(randIdx);
         }
-
         return res;
     };
-
     const randStr1 = getRandomString(Math.floor(Math.random() * (10 - 5 + 1)) + 5);
     const randStr2 = getRandomString(Math.floor(Math.random() * (10 - 5 + 1)) + 5);
-
     return `${randStr1}_${randStr2}`;
 }
 
@@ -27,13 +22,11 @@ function generateRandomSecretValue() {
     const len = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
     let res = '';
     // NB. any char can be added to this string (eg. emojis, non-Latin languages) (except for escape chars) 
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]};:\'"<,>.?/|';
-
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]};:\'"<,>.?/|'; // infisical-scan:ignore
     for (let i = 0; i < len; i++) {
         const randIdx = Math.floor(Math.random() * chars.length);
         res += chars.charAt(randIdx);
     }
-
     return res;
 }
 
@@ -77,17 +70,13 @@ async function fetchData() {
     await client.createSecret(RANDOM_SECRET_NAME_2, reference2);
     await client.createSecret(RANDOM_SECRET_NAME_3, RANDOM_SECRET_VALUE);
 
-    // fetch each secret reference individually
-    const sec1 = await client.getSecret('SECRET_REF_1');
-    const sec2 = await client.getSecret('SECRET_REF_2');
-    const sec3 = await client.getSecret('SECRET_REF_3');
-    const sec4 = await client.getSecret('FULL_HOST');
-    const sec5 = await client.getSecret('MONGO_URL');
-    const sec6 = await client.getSecret(RANDOM_SECRET_NAME_1);
-    const sec7 = await client.getSecret(RANDOM_SECRET_NAME_2);
-    const sec8 = await client.getSecret(RANDOM_SECRET_NAME_3);
-    
-    const getSecretArray = [sec1, sec2, sec3, sec4, sec5, sec6, sec7, sec8];
+    // fetch each secret reference individually  
+    const secretReferences = ['SECRET_REF_1', 'SECRET_REF_2', 'SECRET_REF_3', 'FULL_HOST', 'MONGO_URL', RANDOM_SECRET_NAME_1, RANDOM_SECRET_NAME_2, RANDOM_SECRET_NAME_3];
+
+    const getSecretArray = [];
+    for (const ref of secretReferences) {
+        getSecretArray.push(await client.getSecret(ref));
+    }
 
     const expectedGetSecretValues = [
         'DEEPLY_NESTED_SECRET',
@@ -98,7 +87,6 @@ async function fetchData() {
 
     // run tests for getSecret
     let getSecretTestsPass = true;
-
     for (const ev of expectedGetSecretValues) {
         const count = getSecretArray.filter(s => s.secretValue === ev).length;
         if (ev === 'DEEPLY_NESTED_SECRET') {
@@ -144,7 +132,6 @@ async function fetchData() {
 
     // run tests for getAllSecrets
     let getAllSecretsTestsPass = true;
-
     for (const ev of expectedGetAllSecretsValues) {
         const count = getAllSecretsArray.filter(s => s.secretValue === ev).length;
         if (ev === 'DEEPLY_NESTED_SECRET') {
