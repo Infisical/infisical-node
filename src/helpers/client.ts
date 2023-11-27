@@ -243,7 +243,7 @@ export async function createFolderHelper(
   instance: InfisicalClient,
   name: string,
   options: FolderOptions
-): Promise<IFolder | null> {
+): Promise<IFolder> {
   try {
     if (!instance.clientConfig) throw Error("Failed to find client config");
 
@@ -262,7 +262,13 @@ export async function createFolderHelper(
   } catch (err) {
     if (instance.debug) console.error(err);
 
-    return null;
+    if (err instanceof Error) {
+      throw err;
+    } else if (typeof err === "string") {
+      throw new Error(err);
+    }
+
+    throw new Error("Unhandled error");
   }
 }
 
@@ -271,7 +277,7 @@ export async function updateFolderHelper(
   name: string,
   newName: string,
   options: FolderOptions
-): Promise<IFolder | null> {
+): Promise<IFolder> {
   try {
     if (!instance.clientConfig) throw Error("Failed to find client config");
 
@@ -291,7 +297,13 @@ export async function updateFolderHelper(
   } catch (err) {
     if (instance.debug) console.error(err);
 
-    return null;
+    if (err instanceof Error) {
+      throw err;
+    } else if (typeof err === "string") {
+      throw new Error(err);
+    }
+
+    throw new Error("Unhandled error");
   }
 }
 
@@ -299,7 +311,7 @@ export async function deleteFolderHelper(
   instance: InfisicalClient,
   name: string,
   options: FolderOptions
-): Promise<IFolder[] | null> {
+): Promise<IFolder[]> {
   try {
     if (!instance.clientConfig) throw Error("Failed to find client config");
 
@@ -318,6 +330,12 @@ export async function deleteFolderHelper(
   } catch (err) {
     if (instance.debug) console.error(err);
 
-    return null;
+    if (err instanceof Error) {
+      throw err;
+    } else if (typeof err === "string") {
+      throw new Error(err);
+    }
+
+    throw new Error("Unhandled error");
   }
 }

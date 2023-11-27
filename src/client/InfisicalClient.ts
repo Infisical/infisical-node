@@ -190,7 +190,7 @@ class InfisicalClient {
       environment: "dev",
       directory: "/",
     }
-  ): Promise<IFolder | null> {
+  ): Promise<IFolder> {
     return await createFolderHelper(this, folderName, options);
   }
 
@@ -204,7 +204,7 @@ class InfisicalClient {
       environment: "dev",
       directory: "/",
     }
-  ): Promise<IFolder | null> {
+  ): Promise<IFolder> {
     return await updateFolderHelper(this, name, newName, options);
   }
 
@@ -217,7 +217,7 @@ class InfisicalClient {
       environment: "/",
       directory: "/",
     }
-  ): Promise<IFolder[] | null> {
+  ): Promise<IFolder[]> {
     return await deleteFolderHelper(this, folderName, {
       ...options,
       environment: "dev",

@@ -147,17 +147,17 @@ describe("InfisicalClient", () => {
 
   it("create folder", async () => {
     const folder = await client.createFolder("FOLDER_TWO");
-    expect(folder?.name).toEqual("FOLDER_TWO");
+    expect(folder.name).toEqual("FOLDER_TWO");
   });
 
   it("update folder", async () => {
     const folder = await client.updateFolder("FOLDER_TWO", "FOLDER_THREE");
-    expect(folder?.name).toEqual("FOLDER_THREE");
+    expect(folder.name).toEqual("FOLDER_THREE");
   });
 
   it("delete folder", async () => {
     const folders = await client.deleteFolder("FOLDER_THREE");
-    expect(folders?.length).toBeGreaterThan(0);
+    expect(folders.length).toBeGreaterThan(0);
 
     const deleted = folders?.find((f) => f.name === "FOLDER_THREE");
     expect(deleted?.name).toEqual("FOLDER_THREE");
