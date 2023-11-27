@@ -9,28 +9,30 @@ describe('InfisicalClient', () => {
             token: process.env.INFISICAL_TOKEN!,
             tokenJson: process.env.INFISICAL_TOKEN_JSON!,
             siteURL: process.env.SITE_URL!,
-            debug: true
+            debug: true,
         });
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL');
         await client.createSecret('KEY_ONE', 'KEY_ONE_VAL_PERSONAL', {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
+        await client.createFolder('FOLDER_ONE');
     }, 10000);
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
+        await client.deleteFolder('FOLDER_ONE');
     }, 10000);
 
     it('get overriden personal secret', async () => {
         const secret = await client.getSecret('KEY_ONE', {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         });
 
         expect(secret.secretName).toBe('KEY_ONE');
@@ -41,8 +43,8 @@ describe('InfisicalClient', () => {
     it('get shared secret specified', async () => {
         const secret = await client.getSecret('KEY_ONE', {
             type: 'shared',
-            environment: "dev",
-            path: "/"
+            environment: 'dev',
+            path: '/',
         });
 
         expect(secret.secretName).toBe('KEY_ONE');
@@ -69,9 +71,9 @@ describe('InfisicalClient', () => {
     it('create personal secret', async () => {
         await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL');
         const secretPersonal = await client.createSecret('KEY_FOUR', 'KEY_FOUR_VAL_PERSONAL', {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         });
 
         expect(secretPersonal.secretName).toBe('KEY_FOUR');
@@ -89,9 +91,9 @@ describe('InfisicalClient', () => {
 
     it('update personal secret', async () => {
         const secret = await client.updateSecret('KEY_FOUR', 'BAR', {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         });
 
         expect(secret.secretName).toBe('KEY_FOUR');
@@ -101,9 +103,9 @@ describe('InfisicalClient', () => {
 
     it('delete personal secret', async () => {
         const secret = await client.deleteSecret('KEY_FOUR', {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         });
 
         expect(secret.secretName).toBe('KEY_FOUR');
@@ -128,11 +130,37 @@ describe('InfisicalClient', () => {
         //     attachToProcessEnv: true,
         //     includeImports: false
         // });
-
-        // can't test this because both key are same, only type is diff 
+        // can't test this because both key are same, only type is diff
         // secretBundles.forEach((secretBundle) => {
         //     expect(process.env[secretBundle.secretName]).toBe(secretBundle.secretValue);
         // });
+    });
+
+    it('get folder', async () => {
+        const folders = await client.listFolders();
+
+        expect(folders.length).toBeGreaterThan(0);
+
+        const folder = folders.find((f) => f.name === 'FOLDER_ONE');
+        expect(folder?.name).toEqual('FOLDER_ONE');
+    });
+
+    it('create folder', async () => {
+        const folder = await client.createFolder('FOLDER_TWO');
+        expect(folder.name).toEqual('FOLDER_TWO');
+    });
+
+    it('update folder', async () => {
+        const folder = await client.updateFolder('FOLDER_TWO', 'FOLDER_THREE');
+        expect(folder.name).toEqual('FOLDER_THREE');
+    });
+
+    it('delete folder', async () => {
+        const folders = await client.deleteFolder('FOLDER_THREE');
+        expect(folders.length).toBeGreaterThan(0);
+
+        const deleted = folders?.find((f) => f.name === 'FOLDER_THREE');
+        expect(deleted?.name).toEqual('FOLDER_THREE');
     });
 
     it('encrypt/decrypt symmetric', () => {
@@ -140,18 +168,9 @@ describe('InfisicalClient', () => {
 
         const key = client.createSymmetricKey();
 
-        const {
-            ciphertext,
-            iv,
-            tag
-        } = client.encryptSymmetric(plaintext, key);
+        const { ciphertext, iv, tag } = client.encryptSymmetric(plaintext, key);
 
-        const cleartext = client.decryptSymmetric(
-            ciphertext,
-            key,
-            iv,
-            tag
-        );
+        const cleartext = client.decryptSymmetric(ciphertext, key, iv, tag);
 
         expect(plaintext).toBe(cleartext);
     });

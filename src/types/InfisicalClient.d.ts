@@ -23,7 +23,7 @@ interface BaseConfig {
 }
 
 export interface ServiceTokenClientConfig extends BaseConfig {
-    authMode: "serviceToken"; // TODO: convert to enum
+    authMode: 'serviceToken'; // TODO: convert to enum
     credentials: ServiceTokenCredentials;
     workspaceConfig?: WorkspaceConfig;
 }
@@ -34,16 +34,14 @@ interface ServiceTokenV3Credentials {
 }
 
 export interface ServiceTokenV3ClientConfig extends BaseConfig {
-    authMode: "serviceTokenV3"; // TODO: convert to enum
+    authMode: 'serviceTokenV3'; // TODO: convert to enum
     credentials: ServiceTokenV3Credentials;
     workspaceConfig?: WorkspaceConfig;
 }
 
-export type ClientConfig =
-    | ServiceTokenClientConfig
-    | ServiceTokenV3ClientConfig;
+export type ClientConfig = ServiceTokenClientConfig | ServiceTokenV3ClientConfig;
 
-type SecretType = 'shared' | 'personal'
+type SecretType = 'shared' | 'personal';
 
 interface Options {
     type: SecretType;
@@ -55,10 +53,15 @@ export interface GetAllOptions {
     environment: string;
     path: string;
     attachToProcessEnv: boolean;
-    includeImports: boolean
+    includeImports: boolean;
 }
 
 export interface GetOptions extends Options { }
 export interface CreateOptions extends Options { }
 export interface UpdateOptions extends Options { }
 export interface DeleteOptions extends Options { }
+
+export interface FolderOptions {
+    environment: string;
+    directory: string;
+}

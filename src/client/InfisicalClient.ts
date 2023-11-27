@@ -1,9 +1,6 @@
-import { 
-    INFISICAL_URL, 
-    AuthMode,
-} from '../variables';
+import { INFISICAL_URL, AuthMode } from '../variables';
 import { createApiRequestWithAuthInterceptor } from '../api';
-import { ISecretBundle } from '../types/models';
+import { IFolder, ISecretBundle } from '../types/models';
 import {
     ClientConfig,
     GetAllOptions,
@@ -11,28 +8,25 @@ import {
     CreateOptions,
     UpdateOptions,
     DeleteOptions,
-    InfisicalClientOptions
+    InfisicalClientOptions,
+    FolderOptions,
 } from '../types/InfisicalClient';
-import {
-    IDecryptSymmetricInput,
-    IEncryptSymmetricOutput
-} from '../types/utils';
+import { IEncryptSymmetricOutput } from '../types/utils';
 import {
     getAllSecretsHelper,
     getSecretHelper,
     createSecretHelper,
     updateSecretHelper,
-    deleteSecretHelper
+    deleteSecretHelper,
+    listFoldersHelper,
+    createFolderHelper,
+    updateFolderHelper,
+    deleteFolderHelper,
 } from '../helpers/client';
-import {
-    createSymmetricKey,
-    encryptSymmetric,
-    decryptSymmetric
-} from '../utils/crypto';
+import { createSymmetricKey, encryptSymmetric, decryptSymmetric } from '../utils/crypto';
 
 class InfisicalClient {
-
-    public cache: { [key: string]: ISecretBundle } = {}
+    public cache: { [key: string]: ISecretBundle } = {};
 
     public clientConfig: ClientConfig | undefined = undefined;
     public debug: boolean = false;
@@ -49,7 +43,7 @@ class InfisicalClient {
         tokenJson = undefined,
         siteURL = INFISICAL_URL,
         debug = false,
-        cacheTTL = 300
+        cacheTTL = 300,
     }: InfisicalClientOptions) {
         if (token && token !== '') {
             const lastDotIdx = token.lastIndexOf('.');
@@ -58,45 +52,45 @@ class InfisicalClient {
             this.clientConfig = {
                 authMode: AuthMode.SERVICE_TOKEN,
                 credentials: {
-                    serviceTokenKey: token.substring(lastDotIdx + 1)
+                    serviceTokenKey: token.substring(lastDotIdx + 1),
                 },
                 apiRequest: createApiRequestWithAuthInterceptor({
                     baseURL: siteURL,
-                    serviceToken
+                    serviceToken,
                 }),
-                cacheTTL
-            }
+                cacheTTL,
+            };
         }
-        
-        if (tokenJson && tokenJson !== "") {
+
+        if (tokenJson && tokenJson !== '') {
             const tokenObj = JSON.parse(tokenJson);
-            
+
             this.clientConfig = {
                 authMode: AuthMode.SERVICE_TOKEN_V3,
                 credentials: {
                     publicKey: tokenObj.publicKey,
-                    privateKey: tokenObj.privateKey
+                    privateKey: tokenObj.privateKey,
                 },
                 apiRequest: createApiRequestWithAuthInterceptor({
                     baseURL: siteURL,
-                    serviceToken: tokenObj.serviceToken
+                    serviceToken: tokenObj.serviceToken,
                 }),
-                cacheTTL
-            }
+                cacheTTL,
+            };
         }
 
         this.debug = debug;
     }
 
     /**
-    * Return all the secrets accessible by the instance of Infisical
-    */
+     * Return all the secrets accessible by the instance of Infisical
+     */
     public async getAllSecrets(
         options: GetAllOptions = {
-            environment: "dev",
-            path: "/",
+            environment: 'dev',
+            path: '/',
             attachToProcessEnv: false,
-            includeImports: true
+            includeImports: true,
         }
     ): Promise<ISecretBundle[]> {
         return await getAllSecretsHelper(this, options);
@@ -112,9 +106,9 @@ class InfisicalClient {
     public async getSecret(
         secretName: string,
         options: GetOptions = {
-            type: "personal",
-            environment: "dev",
-            path: "/"
+            type: 'personal',
+            environment: 'dev',
+            path: '/',
         }
     ): Promise<ISecretBundle> {
         return await getSecretHelper(this, secretName, options);
@@ -131,9 +125,9 @@ class InfisicalClient {
         secretName: string,
         secretValue: string,
         options: CreateOptions = {
-            environment: "dev",
-            type: "shared",
-            path: "/"
+            environment: 'dev',
+            type: 'shared',
+            path: '/',
         }
     ): Promise<ISecretBundle> {
         return await createSecretHelper(this, secretName, secretValue, options);
@@ -150,9 +144,9 @@ class InfisicalClient {
         secretName: string,
         secretValue: string,
         options: UpdateOptions = {
-            type: "shared",
-            environment: "dev",
-            path: "/"
+            type: 'shared',
+            environment: 'dev',
+            path: '/',
         }
     ): Promise<ISecretBundle> {
         return await updateSecretHelper(this, secretName, secretValue, options);
@@ -167,12 +161,68 @@ class InfisicalClient {
     public async deleteSecret(
         secretName: string,
         options: DeleteOptions = {
-            environment: "dev",
-            type: "shared",
-            path: "/"
+            environment: 'dev',
+            type: 'shared',
+            path: '/',
         }
     ): Promise<ISecretBundle> {
         return await deleteSecretHelper(this, secretName, options);
+    }
+
+    /**
+     * Return all the folders in a directory
+     */
+    public async listFolders(
+        options: FolderOptions = {
+            environment: 'dev',
+            directory: '/',
+        }
+    ): Promise<IFolder[]> {
+        return await listFoldersHelper(this, options);
+    }
+
+    /**
+     * Creates a folder in a directory
+     */
+    public async createFolder(
+        folderName: string,
+        options: FolderOptions = {
+            environment: 'dev',
+            directory: '/',
+        }
+    ): Promise<IFolder> {
+        return await createFolderHelper(this, folderName, options);
+    }
+
+    /**
+     * Updates the name of a folder
+     */
+    public async updateFolder(
+        name: string,
+        newName: string,
+        options: FolderOptions = {
+            environment: 'dev',
+            directory: '/',
+        }
+    ): Promise<IFolder> {
+        return await updateFolderHelper(this, name, newName, options);
+    }
+
+    /**
+     * Deletes a folder in a specified directory
+     */
+    public async deleteFolder(
+        folderName: string,
+        options: FolderOptions = {
+            environment: '/',
+            directory: '/',
+        }
+    ): Promise<IFolder[]> {
+        return await deleteFolderHelper(this, folderName, {
+            ...options,
+            environment: 'dev',
+            directory: '/',
+        });
     }
 
     /**
@@ -186,7 +236,7 @@ class InfisicalClient {
     /**
      * Encrypt the plaintext [plaintext] with the (base64) 256-bit
      * secret key [key]
-     * @param plaintext 
+     * @param plaintext
      * @param key - base64-encoded, 256-bit symmetric key
      * @returns {IEncryptSymmetricOutput} - an object containing the base64-encoded ciphertext, iv, and tag
      */
@@ -211,8 +261,8 @@ class InfisicalClient {
             ciphertext,
             iv,
             tag,
-            key
-        })
+            key,
+        });
     }
 }
 

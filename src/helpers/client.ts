@@ -4,12 +4,18 @@ import {
     GetOptions,
     CreateOptions,
     UpdateOptions,
-    DeleteOptions
+    DeleteOptions,
+    FolderOptions,
 } from '../types/InfisicalClient';
 import { SecretService } from '../services';
-import { ISecretBundle } from '../types/models';
+import { IFolder, ISecretBundle } from '../types/models';
+import { createFolder, deleteFolder, listFolders, updateFolder } from '../api/folders';
 
-export async function getSecretHelper(instance: InfisicalClient, secretName: string, options: GetOptions): Promise<ISecretBundle> {
+export async function getSecretHelper(
+    instance: InfisicalClient,
+    secretName: string,
+    options: GetOptions
+): Promise<ISecretBundle> {
     const cacheKey = `${options.type}-${secretName}`;
     let cachedSecret: ISecretBundle | undefined = undefined;
     try {
@@ -22,14 +28,13 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
         cachedSecret = instance.cache[cacheKey];
 
         if (cachedSecret) {
-
             const currentTime = new Date();
             const cacheExpiryTime = cachedSecret.lastFetchedAt;
             cacheExpiryTime.setSeconds(cacheExpiryTime.getSeconds() + instance.clientConfig.cacheTTL);
 
             if (currentTime < cacheExpiryTime) {
                 if (instance.debug) {
-                    console.log(`Returning cached secret: ${cachedSecret.secretName}`)
+                    console.log(`Returning cached secret: ${cachedSecret.secretName}`);
                 }
 
                 return cachedSecret;
@@ -39,16 +44,15 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
             secretName,
-            workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
             environment: options.environment,
             path: options.path,
-            type: options.type
+            type: options.type,
         });
 
         instance.cache[`${secretBundle.type}-${secretBundle.secretName}`] = secretBundle;
 
         return secretBundle;
-
     } catch (err) {
         if (instance.debug) console.error(err);
 
@@ -61,7 +65,7 @@ export async function getSecretHelper(instance: InfisicalClient, secretName: str
         }
 
         return await SecretService.getFallbackSecret({
-            secretName
+            secretName,
         });
     }
 }
@@ -77,10 +81,10 @@ export async function getAllSecretsHelper(instance: InfisicalClient, options: Ge
         const secretBundles = await SecretService.getDecryptedSecrets({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
-            workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
             environment: options.environment,
             path: options.path,
-            includeImports: options.includeImports
+            includeImports: options.includeImports,
         });
 
         secretBundles.forEach((secretBundle) => {
@@ -93,13 +97,14 @@ export async function getAllSecretsHelper(instance: InfisicalClient, options: Ge
         });
 
         return secretBundles;
-
     } catch (err) {
         if (instance.debug) console.error(err);
 
-        return [await SecretService.getFallbackSecret({
-            secretName: ''
-        })]
+        return [
+            await SecretService.getFallbackSecret({
+                secretName: '',
+            }),
+        ];
     }
 }
 
@@ -119,25 +124,24 @@ export async function createSecretHelper(
         const secretBundle = await SecretService.createSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
-            workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
             environment: options.environment,
             path: options.path,
             type: options.type,
             secretName,
-            secretValue
+            secretValue,
         });
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
 
         return secretBundle;
-
     } catch (err) {
         if (instance.debug) console.error(err);
 
         return await SecretService.getFallbackSecret({
-            secretName
-        })
+            secretName,
+        });
     }
 }
 
@@ -157,25 +161,24 @@ export async function updateSecretHelper(
         const secretBundle = await SecretService.updateSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
-            workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
             environment: options.environment,
             type: options.type,
             path: options.path,
             secretName,
-            secretValue
+            secretValue,
         });
 
         const cacheKey = `${options.type}-${secretName}`;
         instance.cache[cacheKey] = secretBundle;
 
         return secretBundle;
-
     } catch (err) {
         if (instance.debug) console.error(err);
 
         return await SecretService.getFallbackSecret({
-            secretName
-        })
+            secretName,
+        });
     }
 }
 
@@ -194,23 +197,145 @@ export async function deleteSecretHelper(
         const secretBundle = await SecretService.deleteSecret({
             apiRequest: instance.clientConfig.apiRequest,
             workspaceKey: instance.clientConfig.workspaceConfig.workspaceKey,
-            workspaceId: instance.clientConfig.workspaceConfig?.workspaceId,
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
             environment: options.environment,
             type: options.type,
             path: options.path,
-            secretName
+            secretName,
         });
 
         const cacheKey = `${options.type}-${secretName}`;
         delete instance.cache[cacheKey];
 
         return secretBundle;
-
     } catch (err) {
         if (instance.debug) console.error(err);
 
         return await SecretService.getFallbackSecret({
-            secretName
-        })
+            secretName,
+        });
+    }
+}
+
+export async function listFoldersHelper(instance: InfisicalClient, options: FolderOptions): Promise<IFolder[]> {
+    try {
+        if (!instance.clientConfig) throw Error('Failed to find client config');
+
+        if (!instance.clientConfig.workspaceConfig) {
+            instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
+        }
+
+        const folders = await listFolders(instance.clientConfig.apiRequest, {
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
+            environment: options.environment,
+            directory: options.directory,
+        });
+
+        return folders;
+    } catch (err) {
+        if (instance.debug) console.error(err);
+
+        return [];
+    }
+}
+
+export async function createFolderHelper(
+    instance: InfisicalClient,
+    name: string,
+    options: FolderOptions
+): Promise<IFolder> {
+    try {
+        if (!instance.clientConfig) throw Error('Failed to find client config');
+
+        if (!instance.clientConfig.workspaceConfig) {
+            instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
+        }
+
+        const folder = await createFolder(instance.clientConfig.apiRequest, {
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
+            environment: options.environment,
+            folderName: name,
+            directory: options.directory,
+        });
+
+        return folder;
+    } catch (err) {
+        if (instance.debug) console.error(err);
+
+        if (err instanceof Error) {
+            throw err;
+        } else if (typeof err === 'string') {
+            throw new Error(err);
+        }
+
+        throw new Error('Unhandled error');
+    }
+}
+
+export async function updateFolderHelper(
+    instance: InfisicalClient,
+    name: string,
+    newName: string,
+    options: FolderOptions
+): Promise<IFolder> {
+    try {
+        if (!instance.clientConfig) throw Error('Failed to find client config');
+
+        if (!instance.clientConfig.workspaceConfig) {
+            instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
+        }
+
+        const updateFolderResponse = await updateFolder(instance.clientConfig.apiRequest, {
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
+            environment: options.environment,
+            folderName: name,
+            name: newName,
+            directory: options.directory,
+        });
+
+        return updateFolderResponse.folder;
+    } catch (err) {
+        if (instance.debug) console.error(err);
+
+        if (err instanceof Error) {
+            throw err;
+        } else if (typeof err === 'string') {
+            throw new Error(err);
+        }
+
+        throw new Error('Unhandled error');
+    }
+}
+
+export async function deleteFolderHelper(
+    instance: InfisicalClient,
+    name: string,
+    options: FolderOptions
+): Promise<IFolder[]> {
+    try {
+        if (!instance.clientConfig) throw Error('Failed to find client config');
+
+        if (!instance.clientConfig.workspaceConfig) {
+            instance.clientConfig.workspaceConfig = await SecretService.populateClientWorkspaceConfig(instance.clientConfig);
+        }
+
+        const deleteFolderResponse = await deleteFolder(instance.clientConfig.apiRequest, {
+            workspaceId: instance.clientConfig.workspaceConfig.workspaceId,
+            environment: options.environment,
+            folderName: name,
+            directory: options.directory,
+        });
+
+        return deleteFolderResponse.folders;
+    } catch (err) {
+        if (instance.debug) console.error(err);
+
+        if (err instanceof Error) {
+            throw err;
+        } else if (typeof err === 'string') {
+            throw new Error(err);
+        }
+
+        throw new Error('Unhandled error');
     }
 }

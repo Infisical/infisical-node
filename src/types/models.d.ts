@@ -24,7 +24,7 @@ export interface ISecretBundle {
     version?: number;
     workspace?: string;
     environment?: string;
-    type?: 'shared' | 'personal'
+    type?: 'shared' | 'personal';
     createdAt?: string;
     updatedAt?: string;
     isFallback: boolean;
@@ -49,15 +49,24 @@ export interface IServiceTokenData {
 
 export interface Scope {
     envSlug: string;
-    path: string
+    path: string;
 }
 
 export interface ServiceTokenDataKeyRes {
     key: {
-        _id: string;    
+        _id: string;
         workspace: string;
         encryptedKey: string;
         publicKey: string;
         nonce: string;
-    }
+    };
+}
+
+export interface IFolder {
+    id: string;
+    name: string;
+}
+
+export interface IFolderWithVersion extends IFolder {
+    version: number;
 }

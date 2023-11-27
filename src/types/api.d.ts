@@ -1,5 +1,5 @@
-import { AxiosInstance } from "axios";
-import { ISecret } from "./models";
+import { AxiosInstance } from 'axios';
+import { ISecret } from './models';
 
 export interface ApiRequestInterceptorProps {
     baseURL: string;
@@ -10,7 +10,7 @@ export interface GetSecretsDTO {
     workspaceId: string;
     environment: string;
     path: string;
-    includeImports: boolean
+    includeImports: boolean;
 }
 
 export interface GetSecretDTO {
@@ -42,7 +42,7 @@ export interface UpdateSecretDTO {
     secretName: string;
     workspaceId: string;
     environment: string;
-    type: 'shared' | 'personal'
+    type: 'shared' | 'personal';
     path: string;
     secretValueCiphertext: string;
     secretValueIV: string;
@@ -65,8 +65,38 @@ export interface ImportedSecrets {
 }
 
 export type AllSecretsResponse = {
-    secrets: ISecret[],
-    imports: ImportedSecrets[]
+    secrets: ISecret[];
+    imports: ImportedSecrets[];
+};
+
+export interface ListFoldersDTO {
+    workspaceId: string;
+    environment: string;
+    directory?: string;
+}
+
+export interface CreateFolderDTO {
+    directory?: string;
+    environment: string;
+    folderName: string;
+    workspaceId: string;
+}
+
+export interface UpdateFolderDTO {
+    /** Name of the folder to update */
+    folderName: string;
+    /** New name for the folder */
+    name: string;
+    directory?: string;
+    environment: string;
+    workspaceId: string;
+}
+
+export interface DeleteFolderDTO {
+    folderName: string;
+    directory?: string;
+    environment: string;
+    workspaceId: string;
 }
 
 export { AxiosInstance };
