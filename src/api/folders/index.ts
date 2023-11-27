@@ -1,1 +1,1 @@
-export { listFolders, createFolder, updateFolder, deleteFolder } from "./queries";
+export { listFolders, createFolder, updateFolder, deleteFolder } from './queries';

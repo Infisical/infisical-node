@@ -1,1 +1,1 @@
-export { getSecrets, getSecret, createSecret, updateSecret, deleteSecret } from "./queries";
+export { getSecrets, getSecret, createSecret, updateSecret, deleteSecret } from './queries';
