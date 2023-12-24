@@ -1,9 +1,6 @@
-import { 
-    INFISICAL_URL, 
-    AuthMode,
-} from '../variables';
-import { createApiRequestWithAuthInterceptor } from '../api';
-import { ISecretBundle } from '../types/models';
+import { INFISICAL_URL, AuthMode } from "../variables";
+import { createApiRequestWithAuthInterceptor } from "../api";
+import { ISecretBundle } from "../types/models";
 import {
     ClientConfig,
     GetAllOptions,
@@ -12,27 +9,13 @@ import {
     UpdateOptions,
     DeleteOptions,
     InfisicalClientOptions
-} from '../types/InfisicalClient';
-import {
-    IDecryptSymmetricInput,
-    IEncryptSymmetricOutput
-} from '../types/utils';
-import {
-    getAllSecretsHelper,
-    getSecretHelper,
-    createSecretHelper,
-    updateSecretHelper,
-    deleteSecretHelper
-} from '../helpers/client';
-import {
-    createSymmetricKey,
-    encryptSymmetric,
-    decryptSymmetric
-} from '../utils/crypto';
+} from "../types/InfisicalClient";
+import { IDecryptSymmetricInput, IEncryptSymmetricOutput } from "../types/utils";
+import { getAllSecretsHelper, getSecretHelper, createSecretHelper, updateSecretHelper, deleteSecretHelper } from "../helpers/client";
+import { createSymmetricKey, encryptSymmetric, decryptSymmetric } from "../utils/crypto";
 
 class InfisicalClient {
-
-    public cache: { [key: string]: ISecretBundle } = {}
+    public cache: { [key: string]: ISecretBundle } = {};
 
     public clientConfig: ClientConfig | undefined = undefined;
     public debug: boolean = false;
@@ -44,15 +27,9 @@ class InfisicalClient {
      * @param {Boolean} debug - whether debug is on
      * @param {Number} cacheTTL - time-to-live (in seconds) for refreshing cached secrets.
      */
-    constructor({
-        token = undefined,
-        tokenJson = undefined,
-        siteURL = INFISICAL_URL,
-        debug = false,
-        cacheTTL = 300
-    }: InfisicalClientOptions) {
-        if (token && token !== '') {
-            const lastDotIdx = token.lastIndexOf('.');
+    constructor({ token = undefined, tokenJson = undefined, siteURL = INFISICAL_URL, debug = false, cacheTTL = 300 }: InfisicalClientOptions) {
+        if (token && token !== "") {
+            const lastDotIdx = token.lastIndexOf(".");
             const serviceToken = token.substring(0, lastDotIdx);
 
             this.clientConfig = {
@@ -65,12 +42,12 @@ class InfisicalClient {
                     serviceToken
                 }),
                 cacheTTL
-            }
+            };
         }
-        
+
         if (tokenJson && tokenJson !== "") {
             const tokenObj = JSON.parse(tokenJson);
-            
+
             this.clientConfig = {
                 authMode: AuthMode.SERVICE_TOKEN_V3,
                 credentials: {
@@ -82,15 +59,20 @@ class InfisicalClient {
                     serviceToken: tokenObj.serviceToken
                 }),
                 cacheTTL
-            }
+            };
         }
 
         this.debug = debug;
+
+        // We are deprecating this entire code project, so we should print a deprecation warning
+        console.warn(
+            "WARNING: This codebase is deprecated. Please use the new Infisical SDKs found here: https://www.npmjs.com/package/@infisical/sdk"
+        );
     }
 
     /**
-    * Return all the secrets accessible by the instance of Infisical
-    */
+     * Return all the secrets accessible by the instance of Infisical
+     */
     public async getAllSecrets(
         options: GetAllOptions = {
             environment: "dev",
@@ -186,14 +168,14 @@ class InfisicalClient {
     /**
      * Encrypt the plaintext [plaintext] with the (base64) 256-bit
      * secret key [key]
-     * @param plaintext 
+     * @param plaintext
      * @param key - base64-encoded, 256-bit symmetric key
      * @returns {IEncryptSymmetricOutput} - an object containing the base64-encoded ciphertext, iv, and tag
      */
     public encryptSymmetric(plaintext: string, key: string): IEncryptSymmetricOutput {
         return encryptSymmetric({
             plaintext,
-            key,
+            key
         });
     }
 
@@ -212,7 +194,7 @@ class InfisicalClient {
             iv,
             tag,
             key
-        })
+        });
     }
 }
 
