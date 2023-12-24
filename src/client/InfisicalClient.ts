@@ -66,7 +66,7 @@ class InfisicalClient {
 
         // We are deprecating this entire code project, so we should print a deprecation warning
         console.warn(
-            "WARNING: This codebase is deprecated. Please use the new Infisical SDKs found here: https://www.npmjs.com/package/@infisical/sdk"
+            "WARNING: You are using a deprecated version of the Infisical SDK. Please use the new Infisical SDK found here: https://www.npmjs.com/package/@infisical/sdk"
         );
     }
 
