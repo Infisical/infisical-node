@@ -7,24 +7,28 @@
   <p align="center">Open-source, end-to-end encrypted tool to manage secrets and configs across your team and infrastructure.</p>
 </p>
 
+# Deprecated!
+
+This is now considered a legacy SDK, as we have released a new SDK that will be receiving all future updates. [You can find it here](https://www.npmjs.com/package/@infisical/sdk).
+
 # Table of Contents
 
-- [Links](#links)
-- [Basic Usage](#basic-usage)
-- [Secrets](#working-with-secrets)
-  - [Get Secrets](#get-secrets)
-  - [Get Secret](#get-secret)
-  - [Create Secret](#create-secret)
-  - [Update Secret](#update-secret)
-  - [Delete Secret](#delete-secret)
-- [Cryptography](#cryptography)
-  - [Create Symmetric Key](#create-symmetric-key)
-  - [Encrypt Symmetric](#encrypt-symmetric)
-  - [Decrypt Symmetric](#decrypt-symmetric)
+-   [Links](#links)
+-   [Basic Usage](#basic-usage)
+-   [Secrets](#working-with-secrets)
+    -   [Get Secrets](#get-secrets)
+    -   [Get Secret](#get-secret)
+    -   [Create Secret](#create-secret)
+    -   [Update Secret](#update-secret)
+    -   [Delete Secret](#delete-secret)
+-   [Cryptography](#cryptography)
+    -   [Create Symmetric Key](#create-symmetric-key)
+    -   [Encrypt Symmetric](#encrypt-symmetric)
+    -   [Decrypt Symmetric](#decrypt-symmetric)
 
 # Links
 
-- [Infisical](https://github.com/Infisical/infisical)
+-   [Infisical](https://github.com/Infisical/infisical)
 
 # Basic Usage
 
@@ -35,29 +39,28 @@ const app = express();
 const PORT = 3000;
 
 const client = new InfisicalClient({
-  token: "YOUR_INFISICAL_TOKEN",
+    token: "YOUR_INFISICAL_TOKEN"
 });
 
 app.get("/", async (req, res) => {
-  // access value
-  const name = await client.getSecret("NAME", {
-    environment: "dev",
-    path: "/",
-    type: "shared",
-  });
-  res.send(`Hello! My name is: ${name.secretValue}`);
+    // access value
+    const name = await client.getSecret("NAME", {
+        environment: "dev",
+        path: "/",
+        type: "shared"
+    });
+    res.send(`Hello! My name is: ${name.secretValue}`);
 });
 
 app.listen(PORT, async () => {
-  // initialize client
-  console.log(`App listening on port ${port}`);
+    // initialize client
+    console.log(`App listening on port ${port}`);
 });
 ```
 
 This example demonstrates how to use the Infisical Node SDK with an Express application. The application retrieves a secret named "NAME" and responds to requests with a greeting that includes the secret value.
 
-It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm`
-with components of the encryption/decryption encoded in `base64`.
+It is also possible to use the SDK to encrypt/decrypt text; the implementation uses `aes-256-gcm` with components of the encryption/decryption encoded in `base64`.
 
 ```js
 import InfisicalClient from "infisical-node";
@@ -90,7 +93,7 @@ Import the SDK and create a client instance with your [Infisical Token](https://
 const InfisicalClient = require("infisical-node");
 
 const client = new InfisicalClient({
-  token: "your_infisical_token",
+    token: "your_infisical_token"
 });
 ```
 
@@ -100,7 +103,7 @@ Using ES6:
 import InfisicalClient from "infisical-node";
 
 const client = new InfisicalClient({
-  token: "your_infisical_token",
+    token: "your_infisical_token"
 });
 
 // your app logic
@@ -116,19 +119,19 @@ You can use this beta feature like so:
 const InfisicalClient = require("infisical-node");
 
 const client = new InfisicalClient({
-  tokenJson: "your_infisical_token_v3_json",
+    tokenJson: "your_infisical_token_v3_json"
 });
 ```
 
 ### Options
 
-| Parameter  | Type      | Description                                                                |
-| ---------- | --------- | -------------------------------------------------------------------------- |
-| `token`    | `string`  | An Infisical Token scoped to a project and environment(s).                 |
-| `tokenJson`| `string`  | An Infisical Token V3 JSON scoped to a project and environment(s) - in beta|
-| `siteURL`  | `string`  | Your self-hosted Infisical site URL. Default: `https://app.infisical.com`. |
-| `cacheTTL` | `number`  | Time-to-live (in seconds) for refreshing cached secrets. Default: `300`.   |
-| `debug`    | `boolean` | Turns debug mode on or off. Default: `false`.                              |
+| Parameter   | Type      | Description                                                                 |
+| ----------- | --------- | --------------------------------------------------------------------------- |
+| `token`     | `string`  | An Infisical Token scoped to a project and environment(s).                  |
+| `tokenJson` | `string`  | An Infisical Token V3 JSON scoped to a project and environment(s) - in beta |
+| `siteURL`   | `string`  | Your self-hosted Infisical site URL. Default: `https://app.infisical.com`.  |
+| `cacheTTL`  | `number`  | Time-to-live (in seconds) for refreshing cached secrets. Default: `300`.    |
+| `debug`     | `boolean` | Turns debug mode on or off. Default: `false`.                               |
 
 ### Caching
 
@@ -140,10 +143,10 @@ The SDK caches every secret and updates it periodically based on the provided `c
 
 ```js
 const secrets = await client.getAllSecrets({
-  environment: "dev",
-  path: "/foo/bar/",
-  attachToProcessEnv: false,
-  includeImports: false
+    environment: "dev",
+    path: "/foo/bar/",
+    attachToProcessEnv: false,
+    includeImports: false
 });
 ```
 
@@ -151,11 +154,11 @@ Retrieve all secrets within a given environment and folder path. The service tok
 
 ### Parameters
 
-- `options` (object)
-  - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
-  - `path` The path from where secrets should be fetched from
-  - `attachToProcessEnv` (boolean, optional): Whether or not to attach fetched secrets to `process.env`. If not specified, the default value is `false`.
-  - `includeImports` (boolean, optional): Whether or not to include imported secrets from the current path. Read about [secret import](https://infisical.com/docs/documentation/platform/secret-reference#import-entire-folders).
+-   `options` (object)
+    -   `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+    -   `path` The path from where secrets should be fetched from
+    -   `attachToProcessEnv` (boolean, optional): Whether or not to attach fetched secrets to `process.env`. If not specified, the default value is `false`.
+    -   `includeImports` (boolean, optional): Whether or not to include imported secrets from the current path. Read about [secret import](https://infisical.com/docs/documentation/platform/secret-reference#import-entire-folders).
 
 ## Get Secret
 
@@ -163,9 +166,9 @@ Retrieve a secret from Infisical:
 
 ```js
 const secret = await client.getSecret("API_KEY", {
-  environment: "dev",
-  path: "/",
-  type: "shared"
+    environment: "dev",
+    path: "/",
+    type: "shared"
 });
 const value = secret.secretValue; // get its value
 ```
@@ -176,20 +179,20 @@ To explicitly retrieve a shared secret:
 
 ```js
 const secret = await client.getSecret("API_KEY", {
-  environment: "dev",
-  path: "/",
-  type: "shared"
+    environment: "dev",
+    path: "/",
+    type: "shared"
 });
 const value = secret.secretValue; // get its value
 ```
 
 ### Parameters
 
-- `secretName` (string): The key of the secret to retrieve.
-- `options` (object, optional): An options object to speify the type of secret.
-  - `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
-  - `path` The path from where secrets should be fetched from
-  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
+-   `secretName` (string): The key of the secret to retrieve.
+-   `options` (object, optional): An options object to speify the type of secret.
+    -   `environment` The slug name (dev, prod, etc) of the environment from where secrets should be fetched from
+    -   `path` The path from where secrets should be fetched from
+    -   `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "personal".
 
 ## Create Secret
 
@@ -197,20 +200,20 @@ Create a new secret in Infisical:
 
 ```js
 const newApiKey = await client.createSecret("API_KEY", "FOO", {
-  environment: "dev",
-  path: "/",
-  type: "shared"
+    environment: "dev",
+    path: "/",
+    type: "shared"
 });
 ```
 
 ### Parameters
 
-- `secretName` (string): The key of the secret to create.
-- `secretValue` (string): The value of the secret.
-- `options` (object, optional): An options object to specify the type of secret.
-  - `environment` The slug name (dev, prod, etc) of the environment where secret should be created
-  - `path` The path from where secret should be created.
-  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". A personal secret can only be created if a shared secret with the same name exists.
+-   `secretName` (string): The key of the secret to create.
+-   `secretValue` (string): The value of the secret.
+-   `options` (object, optional): An options object to specify the type of secret.
+    -   `environment` The slug name (dev, prod, etc) of the environment where secret should be created
+    -   `path` The path from where secret should be created.
+    -   `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". A personal secret can only be created if a shared secret with the same name exists.
 
 ## Update Secret
 
@@ -218,20 +221,20 @@ Update an existing secret in Infisical:
 
 ```js
 const updatedApiKey = await client.updateSecret("API_KEY", "BAR", {
-  environment: "dev",
-  path: "/",
-  type: "shared"
+    environment: "dev",
+    path: "/",
+    type: "shared"
 });
 ```
 
 ### Parameters
 
-- `secretName` (string): The key of the secret to update.
-- `secretValue` (string): The new value of the secret.
-- `options` (object, optional): An options object to specify the type of secret.
-  - `environment` The slug name (dev, prod, etc) of the environment where secret should be updated.
-  - `path` The path from where secret should be updated.
-  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared".
+-   `secretName` (string): The key of the secret to update.
+-   `secretValue` (string): The new value of the secret.
+-   `options` (object, optional): An options object to specify the type of secret.
+    -   `environment` The slug name (dev, prod, etc) of the environment where secret should be updated.
+    -   `path` The path from where secret should be updated.
+    -   `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared".
 
 ## Delete Secret
 
@@ -239,19 +242,19 @@ Delete a secret in Infisical:
 
 ```js
 const deletedSecret = await client.deleteSecret("API_KEY", {
-  environment: "dev",
-  path: "/",
-  type: "shared"
+    environment: "dev",
+    path: "/",
+    type: "shared"
 });
 ```
 
 ### Parameters
 
-- `secretName` (string): The key of the secret to delete.
-- `options` (object, optional): An options object to specify the type of secret to delete.
-  - `environment` The slug name (dev, prod, etc) of the environment where secret should be deleted.
-  - `path` The path from where secret should be deleted.
-  - `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
+-   `secretName` (string): The key of the secret to delete.
+-   `options` (object, optional): An options object to specify the type of secret to delete.
+    -   `environment` The slug name (dev, prod, etc) of the environment where secret should be deleted.
+    -   `path` The path from where secret should be deleted.
+    -   `type` (string, optional): The type of the secret. Valid options are "shared" or "personal". If not specified, the default value is "shared". Note that deleting a shared secret also deletes all associated personal secrets.
 
 # Cryptography
 
@@ -277,16 +280,16 @@ const { ciphertext, iv, tag } = client.encryptSymmetric(plaintext, key);
 
 ### Parameters
 
-- `plaintext` (string): The plaintext to encrypt.
-- `key` (string): The base64-encoded, 256-bit symmetric key to use to encrypt the `plaintext`.
+-   `plaintext` (string): The plaintext to encrypt.
+-   `key` (string): The base64-encoded, 256-bit symmetric key to use to encrypt the `plaintext`.
 
 ### Returns
 
 An object containing the following properties:
 
-- `ciphertext` (string): The base64-encoded, encrypted `plaintext`.
-- `iv` (string): The base64-encoded, 96-bit initialization vector generated for the encryption.
-- `tag` (string): The base64-encoded authentication tag generated during the encryption.
+-   `ciphertext` (string): The base64-encoded, encrypted `plaintext`.
+-   `iv` (string): The base64-encoded, 96-bit initialization vector generated for the encryption.
+-   `tag` (string): The base64-encoded authentication tag generated during the encryption.
 
 ## Decrypt Symmetric
 
@@ -298,10 +301,10 @@ const cleartext = client.decryptSymmetric(ciphertext, key, iv, tag);
 
 ## Parameters
 
-- `ciphertext` (string): The ciphertext to decrypt.
-- `key` (string): The base64-encoded, 256-bit symmetric key to use to decrypt the `ciphertext`.
-- `iv` (string): The base64-encoded, 96-bit initiatlization vector generated for the encryption.
-- `tag` (string): The base64-encoded authentication tag generated during encryption.
+-   `ciphertext` (string): The ciphertext to decrypt.
+-   `key` (string): The base64-encoded, 256-bit symmetric key to use to decrypt the `ciphertext`.
+-   `iv` (string): The base64-encoded, 96-bit initiatlization vector generated for the encryption.
+-   `tag` (string): The base64-encoded authentication tag generated during encryption.
 
 ### Returns
 
