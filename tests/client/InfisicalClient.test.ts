@@ -1,6 +1,8 @@
 require('dotenv').config();
-import { describe, expect } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect } from '@jest/globals';
 import InfisicalClient from '../../src';
+
+// please first create a folder called "db-secrets" in the "dev" environment to run these tests
 
 describe('InfisicalClient', () => {
     let client: InfisicalClient;
@@ -18,13 +20,75 @@ describe('InfisicalClient', () => {
             path: "/"
         });
         await client.createSecret('KEY_TWO', 'KEY_TWO_VAL');
-    }, 10000);
+
+        await client.createSecret("SECRET_REF_1", "${SECRET_REF_2}");
+        await client.createSecret("SECRET_REF_2", "${SECRET_REF_3}");
+        await client.createSecret("SECRET_REF_3", "DEEPLY_NESTED_SECRET");
+
+        await client.createSecret("PROTOCOL", "https");
+        await client.createSecret("HOSTNAME", "www.infisical.com");
+        await client.createSecret("FULL_HOST", "${PROTOCOL}://${HOSTNAME}");
+
+        await client.createSecret("USERNAME", "admin2023", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("PASSWORD", "Supersecret123", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("PORT", "4000", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("DB_NAME", "dev", {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets"
+        });
+        await client.createSecret("MONGO_URL", "mongodb://${dev.db-secrets.USERNAME}:${dev.db-secrets.PASSWORD}@${HOSTNAME}:${dev.db-secrets.PORT}/${dev.db-secrets.DB_NAME}");
+    }, 30000);
 
     afterAll(async () => {
         await client.deleteSecret('KEY_ONE');
+        await client.deleteSecret('KEY_ONE', {
+            type: "personal",
+            environment: "dev",
+            path: "/"
+        });
         await client.deleteSecret('KEY_TWO');
         await client.deleteSecret('KEY_THREE');
-    }, 10000);
+        await client.deleteSecret('SECRET_REF_1');
+        await client.deleteSecret('SECRET_REF_2');
+        await client.deleteSecret('SECRET_REF_3');
+        await client.deleteSecret('PROTOCOL');
+        await client.deleteSecret('HOSTNAME');
+        await client.deleteSecret('FULL_HOST');
+        await client.deleteSecret('USERNAME', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('PASSWORD', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('PORT', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('DB_NAME', {
+            type: "shared",
+            environment: "dev",
+            path: "/db-secrets",
+        });
+        await client.deleteSecret('MONGO_URL');
+    }, 30000);
 
     it('get overriden personal secret', async () => {
         const secret = await client.getSecret('KEY_ONE', {
@@ -117,6 +181,34 @@ describe('InfisicalClient', () => {
         expect(secret.secretName).toBe('KEY_FOUR');
         expect(secret.secretValue).toBe('KEY_FOUR_VAL');
         expect(secret.type).toBe('shared');
+    });
+
+    it('get shared secret - secret reference', async () => {
+        const secret = await client.getSecret('FULL_HOST');
+
+        expect(secret.secretName).toBe('FULL_HOST');
+        expect(secret.secretValue).toBe('https://www.infisical.com');
+    });
+
+    it('get all secrets - secret references', async () => {
+        const secrets = await client.getAllSecrets();
+
+        const expectedValues = [
+            'DEEPLY_NESTED_SECRET',
+            'https',
+            'www.infisical.com',
+            'https://www.infisical.com',
+            'mongodb://admin2023:Supersecret123@www.infisical.com:4000/dev'
+        ];
+
+        for (const expectedValue of expectedValues) {
+            const count = secrets.filter(secret => secret.secretValue === expectedValue).length;
+            if (expectedValue === 'DEEPLY_NESTED_SECRET') {
+                expect(count).toBe(3);
+            } else {
+                expect(count).toBe(1);
+            }
+        }
     });
 
     it('attach all to process.env', async () => {

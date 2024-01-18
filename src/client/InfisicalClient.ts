@@ -94,9 +94,9 @@ class InfisicalClient {
     public async getSecret(
         secretName: string,
         options: GetOptions = {
-            type: "personal",
+            type: "shared",
             environment: "dev",
-            path: "/"
+            path: "/",
         }
     ): Promise<ISecretBundle> {
         return await getSecretHelper(this, secretName, options);
